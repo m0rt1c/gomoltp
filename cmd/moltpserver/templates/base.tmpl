@@ -1,0 +1,15 @@
+{{ define "base" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>MOLTP</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/katex.min.css">
+</head>
+<body>
+  {{template "content" .}}
+  <script src="/static/katex.min.js"></script>
+</body>
+</html>
+{{ end }}
