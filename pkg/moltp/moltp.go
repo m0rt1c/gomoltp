@@ -49,11 +49,35 @@ var (
 	terminals = []string{}
 )
 
-func parseRawSequent(rs RawSequent) formula {
-	return formula{}
+func parseRawFormula(rf RawFormula) (formula, error) {
+	return formula{}, nil
+}
+
+func encodeSequent(s sequent) (RawSequent, error) {
+	return RawSequent{}, nil
+}
+
+func proveFormula(f formula) ([]sequent, error) {
+	return []sequent{}, nil
 }
 
 // Prove givent a set of formulas it output a solution
 func Prove(rf RawFormula) ([]RawSequent, error) {
-	return []RawSequent{}, nil
+	var solution []RawSequent
+	f, err := parseRawFormula(rf)
+	if err != nil {
+		return solution, err
+	}
+	s, err := proveFormula(f)
+	if err != nil {
+		return solution, err
+	}
+	for _, sequent := range s {
+		rs, err := encodeSequent(sequent)
+		if err != nil {
+			return solution, nil
+		}
+		solution = append(solution, rs)
+	}
+	return solution, nil
 }
