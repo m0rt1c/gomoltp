@@ -1,29 +1,27 @@
 {{ define "content" }}
 <!-- <h2>Dimostratore</h2> -->
-<h3>Formulas</h3>
 <div>
-  <ol id="formulas">
-    <li id="id0">
-      <input type="text" value="" onblur="render('id0')"><div class="latex"></div>
-    </li>
-  </ol>
+  <h3>Formula</h3>
+  <input id="f1" type="text" value="" onblur="render('f1', 'f1render')"><div id="f1render" class="latex"></div>
 </div>
-<button type="button" onclick="add()">+</button>
-<button onclick="solve()">Solve</button>
+<button onclick="prove()">Prove</button>
 <h2>Solution</h2>
 <div id="solution">
 </div>
 <h2>Symbols</h2>
 <div class="">
   <ul>
-    <li>Not: \lnot</li>
-    <li>Or :\lor</li>
-    <li>And :\land</li>
     <li>Implies: \to</li>
     <li>For all: \forall</li>
     <li>Exists: \exists</li>
     <li>Box: \Box</li>
     <li>Diamond: \Diamond</li>
+  </ul>
+</div>
+<h2>Separators</h2>
+<div class="">
+  <ul>
+    <li>(, ), [, ], {, }</li>
   </ul>
 </div>
 <script src="/static/index.js"></script>

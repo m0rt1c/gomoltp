@@ -1,47 +1,13 @@
-var nf = 0;
-function add(){
-  nf++;
-  let a = document.querySelector("#formulas")
-  let e = document.createElement("li")
-  e.id = String("id"+nf)
-
-  input = document.createElement("input")
-  input.setAttribute("type", "text")
-  input.setAttribute("onblur", String(`render('${e.id}')`))
-
-  button = document.createElement("button")
-  button.setAttribute("type", "button")
-  button.setAttribute("onclick", "rem(this.parentNode)")
-  button.innerText = "-"
-
-  div = document.createElement("div")
-  div.classList.add("latex")
-
-  e.appendChild(input)
-  e.appendChild(button)
-  e.appendChild(div)
-  a.append(e)
+function render(formula, renderer){
+  let input = document.querySelector(String(`#${formula}`))
+  let where = document.querySelector(String(`#${renderer}`))
+  katex.render(String(`${input.value}`), where);
 }
 
-function rem(elem){
-  elem.remove()
-}
+function prove(){
+  var data = {'oid':0, 'formula':document.querySelector("#f1").value}
 
-function render(eid){
-  let i1 = document.querySelector(String(`#${eid} > input:nth-child(1)`))
-  // let i2 = document.querySelector('#'+eid+' :nth-child(2)')
-  let t  = document.querySelector(String(`#${eid} .latex`))
-  // katex.render(String.raw`${i1.value} \gets ${i2.value}`, t);
-  katex.render(String.raw`${i1.value}`, t);
-}
-
-function solve(){
-  var data = []
-  document.querySelectorAll('#formulas li').forEach((elem,i)=>{
-    data.push({'oid':i, 'left':elem.children[0].value, 'right':elem.children[1].value})
-  })
-
-  return fetch("/solve", {
+  return fetch("/prover", {
     method: "POST",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
