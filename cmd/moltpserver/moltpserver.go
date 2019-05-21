@@ -75,7 +75,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func solve(w http.ResponseWriter, r *http.Request) {
+func proofHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -85,16 +85,16 @@ func solve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var formulas []moltp.Formula
+	var formulas moltp.RawFormula
 	err = json.Unmarshal(body, &formulas)
 	if err != nil {
-		log.Println("bad formulas", err)
+		log.Println("bad formula", err)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(infomessage{Info: "Bad formulas"})
 		return
 	}
 
-	solution, err := moltp.Solve(formulas)
+	solution, err := moltp.Prove(formulas)
 
 	// err = json.NewEncoder(w).Encode(reports)
 	if err != nil {
@@ -112,7 +112,7 @@ func main() {
 	doInit()
 
 	http.HandleFunc("/", index)
-	http.HandleFunc("/solve", solve)
+	http.HandleFunc("/prover", proofHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticFolder))))
 
 	log.Fatal(http.ListenAndServe("127.0.0.1:4000", nil))
