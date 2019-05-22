@@ -3,6 +3,7 @@ package moltp
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -181,7 +182,6 @@ func tokenize(s string, term byte) ([]*token, error) {
 	segment := s
 	t := nextToken(s)
 	for t != nil {
-		fmt.Println("Parsing token", t)
 		if t.IsTe {
 			tokens = append(tokens, t)
 		}
@@ -191,9 +191,7 @@ func tokenize(s string, term byte) ([]*token, error) {
 				if k.IsOp && operatorPreceeds(k, t) {
 					ops = ops[:len(ops)-1]
 					tokens = append(tokens, k)
-					fmt.Printf("%s preceeds %s\n", k.Value, t.Value)
 				} else {
-					fmt.Printf("%s does not preceeds %s\n", k.Value, t.Value)
 					break
 				}
 			}
@@ -217,14 +215,6 @@ func tokenize(s string, term byte) ([]*token, error) {
 				}
 			}
 		}
-		fmt.Println("Tokens")
-		for i := len(tokens) - 1; i >= 0; i-- {
-			fmt.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
-		}
-		fmt.Println("OPs")
-		for i := len(ops) - 1; i >= 0; i-- {
-			fmt.Printf("%d: %s\n", len(ops)-i, ops[i].Value)
-		}
 		offset = offset + t.Skip
 		segment := segment[offset:]
 		if len(segment) < 1 {
@@ -246,9 +236,10 @@ func parseRawFormula(rf RawFormula) (*formula, error) {
 	if err != nil {
 		return top, err
 	}
-	fmt.Println("Final")
+
+	log.Printf("Parsed tokens for %s\n", rf.Formula)
 	for i := len(tokens) - 1; i >= 0; i-- {
-		fmt.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
+		log.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
 	}
 	// generateFormulaTree
 	return top, err
