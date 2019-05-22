@@ -1,7 +1,10 @@
 function render(formula, renderer){
   let input = document.querySelector(String(`#${formula}`))
   let where = document.querySelector(String(`#${renderer}`))
-  katex.render(String(`${input.value}`), where);
+  katex.render(String(`${input.value}`), where)
+  if (where.childElementCount < 1) {
+    alert("Error rendering your formula input. It will not be submitted. Check your input.")
+  }
 }
 
 function prove(){
@@ -23,13 +26,17 @@ function prove(){
       response.json().then(function(data){
         a = document.querySelector('#solution')
         a.innerHTML = ''
-        for(var k in data){
+        if (data == null || data == "null")  {
+          alert("Empty reponse!")
+        } else {
+          for(var k in data){
           e = document.createElement('div')
           a.appendChild(e)
           katex.render(String.raw(`{\bf${k}:} ${data[k]}`), e);
         }
+        }
       })
     }
   })
-  .catch(error => console.error(`Fetch Error =\n`, error));
+  .catch(error => alert(`Fetch Error =${error}\n`));
 }
