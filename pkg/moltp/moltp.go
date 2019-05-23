@@ -31,6 +31,7 @@ type (
 	token struct {
 		Value string // token symbol value
 		IsTe  bool   // is terminal
+		IsIn  bool   // is an index for a terminal
 		IsLB  bool   // is left braket
 		IsRB  bool   // is right braket
 		IsOp  bool   // is operator
@@ -70,47 +71,61 @@ func operatorPreceeds(a, b *token) bool {
 	if a.MuOp {
 		return false
 	}
-	if a.UnOp {
+	if a.UnOp && !b.UnOp {
 		return true
 	}
-	switch a.Value {
-	case sOR:
-		switch b.Value {
+	if a.BiOp && b.BiOp {
+		switch a.Value {
 		case sOR:
-			return false
+			switch b.Value {
+			case sOR:
+				return false
+			case sAND:
+				return true
+			case sIMPLIES:
+				return true
+			case sIFF:
+				return true
+			}
 		case sAND:
-			return true
+			switch b.Value {
+			case sOR:
+				return false
+			case sAND:
+				return false
+			case sIMPLIES:
+				return true
+			case sIFF:
+				return true
+			}
 		case sIMPLIES:
-			return true
+			switch b.Value {
+			case sOR:
+				return false
+			case sAND:
+				return false
+			case sIMPLIES:
+				return false
+			case sIFF:
+				return true
+			}
 		case sIFF:
-			return true
+			return false
 		}
-	case sAND:
-		switch b.Value {
-		case sOR:
-			return false
-		case sAND:
-			return false
-		case sIMPLIES:
-			return true
-		case sIFF:
-			return true
-		}
-	case sIMPLIES:
-		switch b.Value {
-		case sOR:
-			return false
-		case sAND:
-			return false
-		case sIMPLIES:
-			return false
-		case sIFF:
-			return true
-		}
-	case sIFF:
-		return false
 	}
 	return false
+}
+
+func matchIndex(s string) (*token, error) {
+	if s[1] == '{' {
+		for j := 2; j < len(s); j++ {
+			if s[j] == '}' {
+				return &token{IsIn: true, Value: fmt.Sprintf("_%s", s[1:j+1]), Skip: j + 2}, nil
+			}
+		}
+		return nil, errors.New("missing closing } in index")
+	}
+	return &token{IsIn: true, Value: fmt.Sprintf("_%c", s[1]), Skip: 2}, nil
 }
 
 // the len(string) was left here instead of the immediate value to better understand from where the value came
@@ -140,24 +155,26 @@ func matchOperator(o, t byte) *token {
 	return nil
 }
 
-func nextToken(s string) *token {
+func nextToken(s string) (*token, error) {
 	switch s[0] {
 	case '(':
-		return &token{IsLB: true, Value: "Round", Skip: 1}
+		return &token{IsLB: true, Value: "Round", Skip: 1}, nil
 	case '[':
-		return &token{IsLB: true, Value: "Square", Skip: 1}
+		return &token{IsLB: true, Value: "Square", Skip: 1}, nil
 	case '{':
-		return &token{IsLB: true, Value: "Curly", Skip: 1}
+		return &token{IsLB: true, Value: "Curly", Skip: 1}, nil
 	case ')':
-		return &token{IsRB: true, Value: "Round", Skip: 1}
+		return &token{IsRB: true, Value: "Round", Skip: 1}, nil
 	case ']':
-		return &token{IsRB: true, Value: "Square", Skip: 1}
+		return &token{IsRB: true, Value: "Square", Skip: 1}, nil
 	case '}':
-		return &token{IsRB: true, Value: "Curly", Skip: 1}
+		return &token{IsRB: true, Value: "Curly", Skip: 1}, nil
 	case '\\':
-		return matchOperator(s[1], s[2])
+		return matchOperator(s[1], s[2]), nil
+	case '_':
+		return matchIndex(s)
 	default:
-		return &token{IsTe: true, Value: fmt.Sprintf("%c", s[0]), Skip: 1}
+		return &token{IsTe: true, Value: fmt.Sprintf("%c", s[0]), Skip: 1}, nil
 	}
 }
 
@@ -180,7 +197,10 @@ func tokenize(s string, term byte) ([]*token, error) {
 	var ops []*token
 	var offset int
 	segment := s
-	t := nextToken(s)
+	t, err := nextToken(s)
+	if err != nil {
+		return tokens, err
+	}
 	for t != nil {
 		if t.IsTe {
 			tokens = append(tokens, t)
@@ -220,7 +240,10 @@ func tokenize(s string, term byte) ([]*token, error) {
 		if len(segment) < 1 {
 			break
 		} else {
-			t = nextToken(segment)
+			t, err = nextToken(segment)
+			if err != nil {
+				return tokens, err
+			}
 		}
 	}
 	for i := len(ops) - 1; i >= 0; i-- {
