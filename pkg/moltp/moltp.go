@@ -76,17 +76,21 @@ func (f *formula) printFormula() {
 			fmt.Printf("%s%s ", f.Terminal, f.Index)
 		}
 	case 1:
-		fmt.Printf("%s ", f.Terminal)
+		fmt.Printf("( %s ", f.Terminal)
 		f.Operands[0].printFormula()
+		fmt.Print(") ")
 	case 2:
+		fmt.Print("( ")
 		f.Operands[0].printFormula()
 		fmt.Printf("%s ", f.Terminal)
 		f.Operands[1].printFormula()
+		fmt.Print(") ")
 	default:
-		fmt.Printf("%s ", f.Terminal)
+		fmt.Printf("( %s ", f.Terminal)
 		for _, o := range f.Operands {
 			o.printFormula()
 		}
+		fmt.Print(") ")
 	}
 }
 
