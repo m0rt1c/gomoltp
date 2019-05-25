@@ -29,11 +29,13 @@ var (
 	indexTemplate   *template.Template
 	staticFolder    string
 	templatesFolder string
+	debugOn         bool
 )
 
 func init() {
 	flag.StringVar(&staticFolder, "static", "/var/www/html/static", "Path to folder holding static files.")
 	flag.StringVar(&templatesFolder, "templates", "/var/www/html/templates", "Path to folder holding html pages templates files.")
+	flag.BoolVar(&debugOn, "v", false, "Swith for log printing")
 }
 
 func fixFolderPath(p string) string {
@@ -94,7 +96,7 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	solution, err := moltp.Prove(formulas)
+	solution, err := moltp.Prove(formulas, debugOn)
 
 	// err = json.NewEncoder(w).Encode(reports)
 	if err != nil {
