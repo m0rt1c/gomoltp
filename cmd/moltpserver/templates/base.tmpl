@@ -2,14 +2,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>MOLTP</title>
+  <title>MOLTP - Modal logic theorem prover</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/static/katex.min.css">
+  <link rel="stylesheet" href="/static/css/katex.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  {{template "content" .}}
-  <script src="/static/katex.min.js"></script>
+  <div class="content">
+    {{template "content" .}}
+  </div>
+  <script src="/static/js/katex.min.js"></script>
 </body>
 </html>
 {{ end }}

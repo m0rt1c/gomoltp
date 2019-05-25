@@ -4,29 +4,31 @@
   <h3>Formula</h3>
   <input id="f1" type="text" value="" onblur="render('f1', 'f1render')"><div id="f1render" class="latex"></div>
 </div>
-<button onclick="prove()">Prove</button>
+<button onclick="render('f1', 'f1render');prove()">Prove</button>
 <h2>Solution</h2>
 <div id="solution">
 </div>
-<h2>Symbols</h2>
-<div class="">
-  <ul>
-    <li>Not: \lnot</li>
-    <li>Or: \lor</li>
-    <li>And: \land</li>
-    <li>Implies: \to</li>
-    <li>Iff: \iff</li>
-    <li>For all: \forall</li>
-    <li>Exists: \exists</li>
-    <li>Box: \Box</li>
-    <li>Diamond: \Diamond</li>
-  </ul>
+<div>
+  <h2>Symbols</h2>
+  <div class="text2left">
+    <ul>
+      <li>Not: \lnot</li>
+      <li>Or: \lor</li>
+      <li>And: \land</li>
+      <li>Implies: \to</li>
+      <li>Iff: \iff</li>
+      <li>For all: \forall</li>
+      <li>Exists: \exists</li>
+      <li>Box: \Box</li>
+      <li>Diamond: \Diamond</li>
+    </ul>
+  </div>
+  <h2>Separators</h2>
+  <div class="text2left">
+    <ul>
+      <li>(, ), [, ], {, }</li>
+    </ul>
+  </div>
 </div>
-<h2>Separators</h2>
-<div class="">
-  <ul>
-    <li>(, ), [, ], {, }</li>
-  </ul>
-</div>
-<script src="/static/index.js"></script>
+<script src="/static/js/index.js"></script>
 {{ end }}
