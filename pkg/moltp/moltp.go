@@ -1,9 +1,7 @@
 package moltp
 
 import (
-	"errors"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -43,15 +41,16 @@ type (
 	}
 
 	operator interface {
+		apply(ops []*formula) bool
 	}
 
-	worldindex struct {
+	or struct {
 	}
 
 	formula struct {
-		Operator   operator
-		Operands   []formula
-		WorldIndex worldindex
+		Operator operator
+		Operands []*formula
+		Terminal string
 	}
 )
 
@@ -66,6 +65,25 @@ const (
 	sOR      = "Or"
 	sNOT     = "Not"
 )
+
+func (f *formula) printFormula() {
+	switch len(f.Operands) {
+	case 0:
+		fmt.Printf("%s ", f.Terminal)
+	case 1:
+		fmt.Printf("%s ", f.Terminal)
+		f.Operands[0].printFormula()
+	case 2:
+		f.Operands[0].printFormula()
+		fmt.Printf("%s ", f.Terminal)
+		f.Operands[1].printFormula()
+	default:
+		fmt.Printf("%s ", f.Terminal)
+		for _, o := range f.Operands {
+			o.printFormula()
+		}
+	}
+}
 
 func operatorPreceeds(a, b *token) bool {
 	if a.MuOp {
@@ -123,7 +141,7 @@ func matchIndex(s string) (*token, error) {
 				return &token{IsIn: true, Value: fmt.Sprintf("_%s", s[1:j+1]), Skip: j + 2}, nil
 			}
 		}
-		return nil, errors.New("missing closing } in index")
+		return nil, fmt.Errorf("missing closing } in index")
 	}
 	return &token{IsIn: true, Value: fmt.Sprintf("_%c", s[1]), Skip: 2}, nil
 }
@@ -153,6 +171,15 @@ func matchOperator(o, t byte) *token {
 		return &token{IsOp: true, UnOp: true, Value: sNOT, Skip: len("\\lnot")}
 	}
 	return nil
+}
+
+func (or) apply(ops []*formula) bool {
+	return false
+}
+
+func genOperator(s string) operator {
+	op := or{}
+	return op
 }
 
 func nextToken(s string) (*token, error) {
@@ -231,7 +258,7 @@ func tokenize(s string, term byte) ([]*token, error) {
 					tokens = append(tokens, k)
 				}
 				if len(ops) == 0 {
-					return tokens, errors.New("missing opening brakets")
+					return tokens, fmt.Errorf("missing opening brakets")
 				}
 			}
 		}
@@ -253,6 +280,43 @@ func tokenize(s string, term byte) ([]*token, error) {
 	return tokens, nil
 }
 
+func genFormulasTree(tokens []*token) (*formula, error) {
+	var formulas []*formula
+	for _, t := range tokens {
+		if t.IsOp {
+			if t.BiOp {
+				if len(formulas) < 2 {
+					return formulas[0], fmt.Errorf("missing argument for binary operator %s", t.Value)
+				}
+				f := &formula{}
+				f.Terminal = t.Value
+				f.Operator = genOperator(t.Value)
+				f.Operands = append(f.Operands, formulas[len(formulas)-2:]...)
+				formulas = formulas[:len(formulas)-2]
+				formulas = append(formulas, f)
+			}
+			if t.UnOp {
+				if len(formulas) < 1 {
+					return formulas[0], fmt.Errorf("missing argument for unary operator %s", t.Value)
+				}
+				f := &formula{}
+				f.Terminal = t.Value
+				f.Operator = genOperator(t.Value)
+				f.Operands = append(f.Operands, formulas[len(formulas)-1:]...)
+				formulas = formulas[:len(formulas)-1]
+				formulas = append(formulas, f)
+			}
+		}
+		if t.IsTe {
+			formulas = append(formulas, &formula{Terminal: t.Value})
+		}
+		if t.IsIn {
+
+		}
+	}
+	return formulas[0], nil
+}
+
 func parseRawFormula(rf RawFormula) (*formula, error) {
 	top := &formula{}
 	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
@@ -260,11 +324,15 @@ func parseRawFormula(rf RawFormula) (*formula, error) {
 		return top, err
 	}
 
-	log.Printf("Parsed tokens for %s\n", rf.Formula)
+	fmt.Printf("Parsed tokens for %s\n", rf.Formula)
 	for i := len(tokens) - 1; i >= 0; i-- {
-		log.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
+		fmt.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
 	}
-	// generateFormulaTree
+
+	top, err = genFormulasTree(tokens)
+	fmt.Printf("Parsed formula for %s\n", rf.Formula)
+	top.printFormula()
+
 	return top, err
 }
 
