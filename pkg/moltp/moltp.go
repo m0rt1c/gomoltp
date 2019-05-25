@@ -51,6 +51,7 @@ type (
 		Operator operator
 		Operands []*formula
 		Terminal string
+		Index    string
 	}
 )
 
@@ -69,7 +70,11 @@ const (
 func (f *formula) printFormula() {
 	switch len(f.Operands) {
 	case 0:
-		fmt.Printf("%s ", f.Terminal)
+		if len(f.Index) < 0 {
+			fmt.Printf("%s ", f.Terminal)
+		} else {
+			fmt.Printf("%s%s ", f.Terminal, f.Index)
+		}
 	case 1:
 		fmt.Printf("%s ", f.Terminal)
 		f.Operands[0].printFormula()
@@ -229,7 +234,7 @@ func tokenize(s string, term byte) ([]*token, error) {
 		return tokens, err
 	}
 	for t != nil {
-		if t.IsTe {
+		if t.IsTe || t.IsIn {
 			tokens = append(tokens, t)
 		}
 		if t.IsOp {
@@ -311,7 +316,10 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 			formulas = append(formulas, &formula{Terminal: t.Value})
 		}
 		if t.IsIn {
-
+			if len(formulas) < 1 {
+				return formulas[0], fmt.Errorf("trying to assign idex %s to nothing", t.Value)
+			}
+			formulas[len(formulas)-1].Index = t.Value
 		}
 	}
 	return formulas[0], nil
