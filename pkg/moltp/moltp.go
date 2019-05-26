@@ -152,17 +152,17 @@ func (s *sequent) String() string {
 func (f *formula) String() string {
 	switch len(f.Operands) {
 	case 0:
-		if len(f.Index) < 0 {
+		if len(f.Index) < 1 {
 			return fmt.Sprintf("%s", f.Terminal)
 		}
-		return fmt.Sprintf("%s%s", f.Terminal, f.Index)
+		return fmt.Sprintf("%s_{%s}", f.Terminal, f.Index)
 	case 1:
-		if len(f.Index) < 0 {
+		if len(f.Index) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
 		}
 		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], f.Index)
 	case 2:
-		if len(f.Index) < 0 {
+		if len(f.Index) < 1 {
 			return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
 		}
 		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], f.Index)
@@ -175,7 +175,7 @@ func (f *formula) String() string {
 				k = fmt.Sprintf("%s, %s", k, o)
 			}
 		}
-		if len(f.Index) < 0 {
+		if len(f.Index) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, k)
 		}
 		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, k, f.Index)
@@ -239,12 +239,12 @@ func matchIndex(s string) (*token, error) {
 	if s[1] == '{' {
 		for j := 2; j < len(s); j++ {
 			if s[j] == '}' {
-				return &token{IsIn: true, Value: fmt.Sprintf("_%s", s[1:j+1]), Skip: j + 2}, nil
+				return &token{IsIn: true, Value: fmt.Sprintf("%s", s[1:j]), Skip: j + 2}, nil
 			}
 		}
 		return nil, fmt.Errorf("missing closing } in index")
 	}
-	return &token{IsIn: true, Value: fmt.Sprintf("_%c", s[1]), Skip: 2}, nil
+	return &token{IsIn: true, Value: fmt.Sprintf("%c", s[1]), Skip: 2}, nil
 }
 
 // TODO: Find a better way to init this object
