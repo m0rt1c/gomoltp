@@ -20,9 +20,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	var rf moltp.RawFormula
-	rf.OID = 0
-	rf.Formula = formula
+	rf := &moltp.RawFormula{OID: 0, Formula: formula}
 	solution, err := moltp.Prove(rf, debugOn)
 	if err != nil {
 		log.Println(err)
