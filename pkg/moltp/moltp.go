@@ -351,30 +351,6 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 	return formulas[0], nil
 }
 
-func parseRawFormula(rf RawFormula, debugOn bool) (*formula, error) {
-	top := &formula{}
-	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
-	if err != nil {
-		return top, err
-	}
-
-	if debugOn {
-		fmt.Printf("Parsed tokens for %s\n", rf.Formula)
-		for i := len(tokens) - 1; i >= 0; i-- {
-			fmt.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
-		}
-	}
-
-	top, err = genFormulasTree(tokens)
-
-	if debugOn {
-		fmt.Printf("Parsed formula for %s\n", rf.Formula)
-		fmt.Println(top)
-	}
-
-	return top, err
-}
-
 func encodeSequent(s *sequent) (*RawSequent, error) {
 	rs := &RawSequent{}
 
@@ -408,12 +384,26 @@ func proveFormula(f *formula) (*map[int]*sequent, error) {
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
-func Prove(rf RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
-	f, err := parseRawFormula(rf, debugOn)
+func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
+	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
 	if err != nil {
 		return nil, err
 	}
-	s, err := proveFormula(f)
+	if debugOn {
+		fmt.Printf("Parsed tokens for %s\n", rf.Formula)
+		for i := len(tokens) - 1; i >= 0; i-- {
+			fmt.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
+		}
+	}
+	top, err := genFormulasTree(tokens)
+	if err != nil {
+		return nil, err
+	}
+	if debugOn {
+		fmt.Printf("Parsed formula for %s\n", rf.Formula)
+		fmt.Println(top)
+	}
+	s, err := proveFormula(top)
 	if err != nil {
 		return nil, err
 	}
