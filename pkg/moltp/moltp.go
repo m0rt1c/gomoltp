@@ -3,6 +3,7 @@ package moltp
 import (
 	"fmt"
 	"strings"
+	"sync"
 )
 
 type (
@@ -63,6 +64,11 @@ const (
 	sAND     = "And"
 	sOR      = "Or"
 	sNOT     = "Not"
+)
+
+var (
+	sEInit    = &sync.Once{}
+	sEncoding = make(map[string]string)
 )
 
 func (f *formula) String() string {
@@ -148,6 +154,27 @@ func matchIndex(s string) (*token, error) {
 		return nil, fmt.Errorf("missing closing } in index")
 	}
 	return &token{IsIn: true, Value: fmt.Sprintf("_%c", s[1]), Skip: 2}, nil
+}
+
+// TODO: Find a better way to init this object
+func initsEncoding() {
+	sEncoding[sBOX] = "\\Box"
+	sEncoding[sDIAMOND] = "\\Diamond"
+	sEncoding[sEXISTS] = "\\exists"
+	sEncoding[sFORALL] = "\\forall"
+	sEncoding[sIFF] = "\\iff"
+	sEncoding[sIMPLIES] = "\\to"
+	sEncoding[sAND] = "\\land"
+	sEncoding[sOR] = "\\lor"
+	sEncoding[sNOT] = "\\lnot"
+}
+
+func toTextRepr(s string) string {
+	sEInit.Do(initsEncoding)
+	for k, v := range sEncoding {
+		s = strings.Replace(s, k, v, -1)
+	}
+	return s
 }
 
 // the len(string) was left here instead of the immediate value to better understand from where the value came
@@ -358,6 +385,7 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 			rs.Left = fmt.Sprintf("%s, %s", rs.Left, f)
 		}
 	}
+	rs.Left = toTextRepr(rs.Left)
 
 	for _, f := range s.Right {
 		if rs.Right == "" {
@@ -366,6 +394,7 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 			rs.Right = fmt.Sprintf("%s, %s", rs.Left, f)
 		}
 	}
+	rs.Right = toTextRepr(rs.Right)
 
 	return rs, nil
 }
