@@ -88,10 +88,16 @@ var (
 )
 
 func (r r1) applyRuleTo(s *map[int]*sequent) (*sequent, error) {
+	if len(*s) < 2 {
+		return nil, nil
+	}
 	return nil, nil
 }
 
 func (r r2) applyRuleTo(s *map[int]*sequent) (*sequent, error) {
+	if len(*s) < 1 {
+		return nil, nil
+	}
 	return nil, nil
 }
 
@@ -127,8 +133,20 @@ func (r r10) applyRuleTo(s *map[int]*sequent) (*sequent, error) {
 	return nil, nil
 }
 
+func formulaArrayToString(a []*formula) string {
+	out := ""
+	for _, f := range a {
+		if out == "" {
+			out = fmt.Sprintf("%s", f)
+		} else {
+			out = fmt.Sprintf("%s, %s", a, f)
+		}
+	}
+	return out
+}
+
 func (s *sequent) String() string {
-	return fmt.Sprintf("%s <- %s", s.Left, s.Right)
+	return fmt.Sprintf("%s <- %s", formulaArrayToString(s.Left), formulaArrayToString(s.Right))
 }
 
 func (f *formula) String() string {
@@ -139,9 +157,15 @@ func (f *formula) String() string {
 		}
 		return fmt.Sprintf("%s%s", f.Terminal, f.Index)
 	case 1:
-		return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
+		if len(f.Index) < 0 {
+			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
+		}
+		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], f.Index)
 	case 2:
-		return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
+		if len(f.Index) < 0 {
+			return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
+		}
+		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], f.Index)
 	default:
 		k := ""
 		for _, o := range f.Operands {
@@ -151,7 +175,10 @@ func (f *formula) String() string {
 				k = fmt.Sprintf("%s, %s", k, o)
 			}
 		}
-		return fmt.Sprintf("( %s %s )", f.Terminal, k)
+		if len(f.Index) < 0 {
+			return fmt.Sprintf("( %s %s )", f.Terminal, k)
+		}
+		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, k, f.Index)
 	}
 }
 
@@ -414,23 +441,8 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 func encodeSequent(s *sequent) (*RawSequent, error) {
 	rs := &RawSequent{}
 
-	for _, f := range s.Left {
-		if rs.Left == "" {
-			rs.Left = fmt.Sprintf("%s", f)
-		} else {
-			rs.Left = fmt.Sprintf("%s, %s", rs.Left, f)
-		}
-	}
-	rs.Left = toTextRepr(rs.Left)
-
-	for _, f := range s.Right {
-		if rs.Right == "" {
-			rs.Right = fmt.Sprintf("%s", f)
-		} else {
-			rs.Right = fmt.Sprintf("%s, %s", rs.Left, f)
-		}
-	}
-	rs.Right = toTextRepr(rs.Right)
+	rs.Left = toTextRepr(formulaArrayToString(s.Left))
+	rs.Right = toTextRepr(formulaArrayToString(s.Right))
 
 	return rs, nil
 }
