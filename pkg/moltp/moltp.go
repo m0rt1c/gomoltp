@@ -54,8 +54,8 @@ type (
 	}
 
 	inferenceRule interface {
-		applyRuleTo(s *sequent) *sequent
-		canBeApplyTo(s *sequent) bool
+		applyRuleTo(s *map[int]*sequent) *sequent
+		canBeApplyTo(s *map[int]*sequent) bool
 	}
 
 	r1  struct{}
@@ -88,83 +88,83 @@ var (
 	rules     = []inferenceRule{r1{}, r2{}, r3{}, r4{}, r5{}, r6{}, r7{}, r8{}, r9{}, r10{}}
 )
 
-func (r r1) applyRuleTo(s *sequent) *sequent {
+func (r r1) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r1) canBeApplyTo(s *sequent) bool {
+func (r r1) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r2) applyRuleTo(s *sequent) *sequent {
+func (r r2) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r2) canBeApplyTo(s *sequent) bool {
+func (r r2) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r3) applyRuleTo(s *sequent) *sequent {
+func (r r3) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r3) canBeApplyTo(s *sequent) bool {
+func (r r3) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r4) applyRuleTo(s *sequent) *sequent {
+func (r r4) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r4) canBeApplyTo(s *sequent) bool {
+func (r r4) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r5) applyRuleTo(s *sequent) *sequent {
+func (r r5) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r5) canBeApplyTo(s *sequent) bool {
+func (r r5) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r6) applyRuleTo(s *sequent) *sequent {
+func (r r6) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r6) canBeApplyTo(s *sequent) bool {
+func (r r6) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r7) applyRuleTo(s *sequent) *sequent {
+func (r r7) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r7) canBeApplyTo(s *sequent) bool {
+func (r r7) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r8) applyRuleTo(s *sequent) *sequent {
+func (r r8) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r8) canBeApplyTo(s *sequent) bool {
+func (r r8) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r9) applyRuleTo(s *sequent) *sequent {
+func (r r9) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r9) canBeApplyTo(s *sequent) bool {
+func (r r9) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
-func (r r10) applyRuleTo(s *sequent) *sequent {
+func (r r10) applyRuleTo(s *map[int]*sequent) *sequent {
 	return nil
 }
 
-func (r r10) canBeApplyTo(s *sequent) bool {
+func (r r10) canBeApplyTo(s *map[int]*sequent) bool {
 	return false
 }
 
@@ -200,13 +200,13 @@ func (or) apply(ops []*formula) bool {
 	return false
 }
 
-func getAppliableRule(s *sequent) (*inferenceRule, error) {
+func getAppliableRule(s *map[int]*sequent) (*inferenceRule, error) {
 	for _, rule := range rules {
 		if rule.canBeApplyTo(s) {
 			return &rule, nil
 		}
 	}
-	return nil, fmt.Errorf("no appliable rule for %s", s)
+	return nil, fmt.Errorf("no appliable inference rule")
 }
 
 func operatorPreceeds(a, b *token) bool {
@@ -490,11 +490,11 @@ func proveFormula(f *formula) (*map[int]*sequent, error) {
 	solution := make(map[int]*sequent)
 	solution[i] = &sequent{Right: []*formula{f}}
 	for {
-		rule, err := getAppliableRule(solution[i])
+		rule, err := getAppliableRule(&solution)
 		if err != nil {
 			return &solution, err
 		}
-		s := (*rule).applyRuleTo(solution[i])
+		s := (*rule).applyRuleTo(&solution)
 		i = i + 1
 		solution[i] = s
 		if s.Left == nil && s.Right == nil {
