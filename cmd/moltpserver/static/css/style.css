@@ -8,6 +8,11 @@
   text-align: left;
 }
 
+.sequntsegment {
+  width: 33%;
+  display: inline-block;
+}
+
 #f1 {
   width: 60%;
 }

@@ -20,7 +20,7 @@ function prove(){
   .then(function(response) {
     if (response.status != 200) {
       response.json().then(function(data){
-          alert("Info: "+String(data["info"]))
+        alert("Info: "+String(data["info"]))
       })
     } else {
       response.json().then(function(data){
@@ -29,11 +29,26 @@ function prove(){
         if (data == null || data == "null")  {
           alert("Empty reponse!")
         } else {
-          for(var k in data){
-          e = document.createElement('div')
-          a.appendChild(e)
-          katex.render(String.raw(`{\bf${k}:} ${data[k]}`), e);
-        }
+          var k = 0
+          var s = data[k]
+          while( s != undefined ){
+            li = document.createElement('li')
+            a.appendChild(li)
+            d1 = document.createElement('div')
+            d1.classList.add("sequntsegment")
+            d2 = document.createElement('div')
+            d2.classList.add("sequntsegment")
+            d3 = document.createElement('div')
+            d3.classList.add("sequntsegment")
+            li.appendChild(d1)
+            li.appendChild(d2)
+            li.appendChild(d3)
+            katex.render(String(`${s["left"]}`), d1);
+            katex.render("\\leftarrow", d2);
+            katex.render(String(`${s["right"]}`), d3);
+            k++
+            s = data[k]
+          }
         }
       })
     }
