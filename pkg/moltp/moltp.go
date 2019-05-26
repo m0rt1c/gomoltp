@@ -168,6 +168,10 @@ func (r r10) canBeApplyTo(s *sequent) bool {
 	return false
 }
 
+func (s *sequent) String() string {
+	return fmt.Sprintf("%s <- %s", s.Left, s.Right)
+}
+
 func (f *formula) String() string {
 	switch len(f.Operands) {
 	case 0:
@@ -202,7 +206,7 @@ func getAppliableRule(s *sequent) (*inferenceRule, error) {
 			return &rule, nil
 		}
 	}
-	return nil, nil
+	return nil, fmt.Errorf("no appliable rule for %s", s)
 }
 
 func operatorPreceeds(a, b *token) bool {
