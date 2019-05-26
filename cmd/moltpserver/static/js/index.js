@@ -37,7 +37,7 @@ function prove(){
             d1 = document.createElement('div')
             d1.classList.add("sequntsegment")
             d2 = document.createElement('div')
-            d2.classList.add("sequntsegment")
+            d2.classList.add("sequntdivider")
             d3 = document.createElement('div')
             d3.classList.add("sequntsegment")
             li.appendChild(d1)

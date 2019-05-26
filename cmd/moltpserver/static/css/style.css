@@ -9,7 +9,12 @@
 }
 
 .sequntsegment {
-  width: 33%;
+  width: 45%;
+  display: inline-block;
+}
+
+.sequntdivider {
+  width: 5%;
   display: inline-block;
 }
 
