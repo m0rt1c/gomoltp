@@ -87,8 +87,8 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var rf moltp.RawFormula
-	err = json.Unmarshal(body, &rf)
+	rf := &moltp.RawFormula{}
+	err = json.Unmarshal(body, rf)
 	if err != nil {
 		log.Println("bad formula", err)
 		w.WriteHeader(http.StatusBadRequest)
