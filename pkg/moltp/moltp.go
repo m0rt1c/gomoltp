@@ -52,6 +52,22 @@ type (
 		Terminal string
 		Index    string
 	}
+
+	inferenceRule interface {
+		applyRuleTo(s *sequent) *sequent
+		canBeApplyTo(s *sequent) bool
+	}
+
+	r1  struct{}
+	r2  struct{}
+	r3  struct{}
+	r4  struct{}
+	r5  struct{}
+	r6  struct{}
+	r7  struct{}
+	r8  struct{}
+	r9  struct{}
+	r10 struct{}
 )
 
 const (
@@ -69,7 +85,88 @@ const (
 var (
 	sEInit    = &sync.Once{}
 	sEncoding = make(map[string]string)
+	rules     = []inferenceRule{r1{}, r2{}, r3{}, r4{}, r5{}, r6{}, r7{}, r8{}, r9{}, r10{}}
 )
+
+func (r r1) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r1) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r2) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r2) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r3) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r3) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r4) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r4) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r5) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r5) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r6) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r6) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r7) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r7) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r8) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r8) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r9) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r9) canBeApplyTo(s *sequent) bool {
+	return false
+}
+
+func (r r10) applyRuleTo(s *sequent) *sequent {
+	return nil
+}
+
+func (r r10) canBeApplyTo(s *sequent) bool {
+	return false
+}
 
 func (f *formula) String() string {
 	switch len(f.Operands) {
@@ -93,6 +190,19 @@ func (f *formula) String() string {
 		}
 		return fmt.Sprintf("( %s %s )", f.Terminal, k)
 	}
+}
+
+func (or) apply(ops []*formula) bool {
+	return false
+}
+
+func getAppliableRule(s *sequent) (*inferenceRule, error) {
+	for _, rule := range rules {
+		if rule.canBeApplyTo(s) {
+			return &rule, nil
+		}
+	}
+	return nil, nil
 }
 
 func operatorPreceeds(a, b *token) bool {
@@ -202,10 +312,6 @@ func matchOperator(o, t byte) *token {
 		return &token{IsOp: true, UnOp: true, Value: sNOT, Skip: len("\\lnot")}
 	}
 	return nil
-}
-
-func (or) apply(ops []*formula) bool {
-	return false
 }
 
 func genOperator(s string) operator {
@@ -376,11 +482,21 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 }
 
 func proveFormula(f *formula) (*map[int]*sequent, error) {
+	i := 0
 	solution := make(map[int]*sequent)
-
-	solution[0] = &sequent{Right: []*formula{f}}
-
-	return &solution, nil
+	solution[i] = &sequent{Right: []*formula{f}}
+	for {
+		rule, err := getAppliableRule(solution[i])
+		if err != nil {
+			return &solution, err
+		}
+		s := (*rule).applyRuleTo(solution[i])
+		i = i + 1
+		solution[i] = s
+		if s.Left == nil && s.Right == nil {
+			return &solution, nil
+		}
+	}
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
