@@ -15,15 +15,13 @@ type (
 	// RawSequent object holding a single unparsed sequent
 	// Left and right parts are encoded using a TEX notation
 	RawSequent struct {
-		OID   int    `json:"oid"`
 		Left  string `json:"left"`
 		Right string `json:"right"`
 	}
 
 	sequent struct {
-		OID   int
-		Left  []formula
-		Right []formula
+		Left  []*formula
+		Right []*formula
 	}
 
 	token struct {
@@ -67,30 +65,27 @@ const (
 	sNOT     = "Not"
 )
 
-func (f *formula) printFormula() {
+func (f *formula) String() string {
 	switch len(f.Operands) {
 	case 0:
 		if len(f.Index) < 0 {
-			fmt.Printf("%s ", f.Terminal)
-		} else {
-			fmt.Printf("%s%s ", f.Terminal, f.Index)
+			return fmt.Sprintf("%s", f.Terminal)
 		}
+		return fmt.Sprintf("%s%s", f.Terminal, f.Index)
 	case 1:
-		fmt.Printf("( %s ", f.Terminal)
-		f.Operands[0].printFormula()
-		fmt.Print(") ")
+		return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
 	case 2:
-		fmt.Print("( ")
-		f.Operands[0].printFormula()
-		fmt.Printf("%s ", f.Terminal)
-		f.Operands[1].printFormula()
-		fmt.Print(") ")
+		return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
 	default:
-		fmt.Printf("( %s ", f.Terminal)
+		k := ""
 		for _, o := range f.Operands {
-			o.printFormula()
+			if k == "" {
+				k = fmt.Sprintf("%s", o)
+			} else {
+				k = fmt.Sprintf("%s, %s", k, o)
+			}
 		}
-		fmt.Print(") ")
+		return fmt.Sprintf("( %s %s )", f.Terminal, k)
 	}
 }
 
@@ -347,38 +342,59 @@ func parseRawFormula(rf RawFormula, debugOn bool) (*formula, error) {
 
 	if debugOn {
 		fmt.Printf("Parsed formula for %s\n", rf.Formula)
-		top.printFormula()
-		fmt.Println()
+		fmt.Println(top)
 	}
 
 	return top, err
 }
 
-func encodeSequent(s sequent) (RawSequent, error) {
-	return RawSequent{}, nil
+func encodeSequent(s *sequent) (*RawSequent, error) {
+	rs := &RawSequent{}
+
+	for _, f := range s.Left {
+		if rs.Left == "" {
+			rs.Left = fmt.Sprintf("%s", f)
+		} else {
+			rs.Left = fmt.Sprintf("%s, %s", rs.Left, f)
+		}
+	}
+
+	for _, f := range s.Right {
+		if rs.Right == "" {
+			rs.Right = fmt.Sprintf("%s", f)
+		} else {
+			rs.Right = fmt.Sprintf("%s, %s", rs.Left, f)
+		}
+	}
+
+	return rs, nil
 }
 
-func proveFormula(f *formula) ([]sequent, error) {
-	return []sequent{}, nil
+func proveFormula(f *formula) (*map[int]*sequent, error) {
+	solution := make(map[int]*sequent)
+
+	solution[0] = &sequent{Right: []*formula{f}}
+
+	return &solution, nil
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
-func Prove(rf RawFormula, debugOn bool) ([]RawSequent, error) {
-	var solution []RawSequent
+func Prove(rf RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	f, err := parseRawFormula(rf, debugOn)
 	if err != nil {
-		return solution, err
+		return nil, err
 	}
 	s, err := proveFormula(f)
 	if err != nil {
-		return solution, err
+		return nil, err
 	}
-	for _, sequent := range s {
+	rawSolution := make(map[int]*RawSequent)
+	for key, sequent := range *s {
 		rs, err := encodeSequent(sequent)
 		if err != nil {
-			return solution, nil
+			return &rawSolution, nil
 		}
-		solution = append(solution, rs)
+		rawSolution[key] = rs
 	}
-	return solution, nil
+	return &rawSolution, nil
 }
