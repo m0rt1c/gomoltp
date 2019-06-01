@@ -94,6 +94,11 @@ func (r r1) applyRuleTo(s *map[int]*sequent) (*sequent, error) {
 	return nil, nil
 }
 
+// this functions rapresenting inference rules returns
+// 1) a sequent and a nil if the rule was applied successfully. The returned sequent is the result of applying the rule
+// 2) nil and nil if the sequent was not appliable
+// 3) nil and an error if there was some sort of error
+
 func (r r2) applyRuleTo(s *map[int]*sequent) (*sequent, error) {
 	if len(*s) < 1 {
 		return nil, nil
