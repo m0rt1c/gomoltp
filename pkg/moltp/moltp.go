@@ -510,7 +510,8 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	s, err := proveFormula(top)
 	if debugOn {
 		fmt.Println("Sequents:")
-		for key, sequent := range *s {
+		for key := 0; key < len(*s); key++ {
+			sequent := (*s)[key]
 			fmt.Printf("%d: %s <- %s\n", key, formulaArrayToString(sequent.Left), formulaArrayToString(sequent.Right))
 		}
 	}
