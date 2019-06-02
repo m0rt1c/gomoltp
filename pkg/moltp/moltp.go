@@ -21,8 +21,10 @@ type (
 	}
 
 	sequent struct {
-		Left  []*formula
-		Right []*formula
+		Name          string
+		Justification []string
+		Left          []*formula
+		Right         []*formula
 	}
 
 	token struct {
