@@ -484,33 +484,38 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 func proveFormula(f *formula) (*map[int]*sequent, error) {
 	i := 0
 	solution := make(map[int]*sequent)
+	unreduced := []*sequent{}
 	f.Index = "0"
-	solution[i] = &sequent{Right: []*formula{f}}
-	for {
+	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S0"})
+	for len(unreduced) > 0 {
 		ruleWasApplied := false
 		// Try to apply each rule
 		for _, rule := range rules {
-			s, err := rule.applyRuleTo(solution[i])
+			last := unreduced[len(unreduced)-1]
+			s, err := rule.applyRuleTo(last)
 			if err != nil {
 				return &solution, err
 			}
 			if s != nil {
 				// The rule was applied successfully
 				i = i + 1
-				solution[i] = s
-				if s.Left == nil && s.Right == nil {
+				solution[i] = last
+				if len(s.Left) == 0 && len(s.Right) == 0 {
 					// A solution was found
+					i = i + 1
+					solution[i] = s
 					return &solution, nil
 				}
+				unreduced = append(unreduced, s)
 				ruleWasApplied = true
-				break
 			}
-			// if s was null it, the rule was not appliable to the current sequent
+			// else the rule was not appliable
 		}
 		if !ruleWasApplied {
 			return &solution, fmt.Errorf("no rule was applied")
 		}
 	}
+	return &solution, nil
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
