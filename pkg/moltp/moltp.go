@@ -106,20 +106,20 @@ func (r r2) applyRuleTo(s *sequent) (*sequent, error) {
 	if l < 1 {
 		return nil, nil
 	}
-	lastformula := s.Left[l-1]
-	if lastformula.Terminal == sIMPLIES {
-		new := &sequent{}
+	f := s.Left[l-1]
+	if f.Terminal == sIMPLIES {
+		n := &sequent{}
 
-		t := copyTopFormulaLevel(lastformula.Operands[1])
-		t.Index = lastformula.Index
-		new.Left = append(s.Left[:l-1], t)
+		t := copyTopFormulaLevel(f.Operands[1])
+		t.Index = f.Index
+		n.Left = append(s.Left[:l-1], t)
 
-		t = copyTopFormulaLevel(lastformula.Operands[0])
-		t.Index = lastformula.Index
-		new.Right = append([]*formula{t}, s.Right...)
+		t = copyTopFormulaLevel(f.Operands[0])
+		t.Index = f.Index
+		n.Right = append([]*formula{t}, s.Right...)
 
-		new.Justification = append(s.Justification, s.Name)
-		return new, nil
+		n.Justification = append(s.Justification, s.Name)
+		return n, nil
 	}
 	return nil, nil
 }
