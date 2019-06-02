@@ -103,6 +103,9 @@ func (r r1) applyRuleTo(s *sequent) (*sequent, error) {
 // R2: If S,|(p->q)|_{i} <- T then S,|q|_{i}<-|p|_{i},T
 func (r r2) applyRuleTo(s *sequent) (*sequent, error) {
 	l := len(s.Left)
+	if l < 1 {
+		return nil, nil
+	}
 	lastformula := s.Left[l-1]
 	if lastformula.Terminal == sIMPLIES {
 		new := &sequent{}
