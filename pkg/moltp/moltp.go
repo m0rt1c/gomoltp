@@ -92,6 +92,8 @@ var (
 // 2) nil and nil if the sequent was not appliable
 // 3) nil and an error if there was some sort of error
 
+// R1: If S,|p|_{i} <- T and S' <- |q|_{j}, T' and |p|_{i} and |q|_{j}
+// unify with unification O then S_{O} U S'_{O} <- T_{O} U T'_{O}
 func (r r1) applyRuleTo(s *sequent) (*sequent, error) {
 	return nil, nil
 }
