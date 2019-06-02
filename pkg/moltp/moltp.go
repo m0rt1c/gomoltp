@@ -500,6 +500,7 @@ func proveFormula(f *formula) (*map[int]*sequent, error) {
 			if s != nil {
 				// The rule was applied successfully
 				i = i + 1
+				s.Name = fmt.Sprintf("S%d", i)
 				solution[i] = last
 				if len(s.Left) == 0 && len(s.Right) == 0 {
 					// A solution was found
