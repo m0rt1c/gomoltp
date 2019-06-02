@@ -98,6 +98,21 @@ func (r r1) applyRuleTo(s *sequent) (*sequent, error) {
 
 // R2: If S,|(p->q)|_{i} <- T then S,|q|_{i}<-|p|_{i},T
 func (r r2) applyRuleTo(s *sequent) (*sequent, error) {
+	l := len(s.Left)
+	lastformula := s.Left[l-1]
+	if lastformula.Terminal == sIMPLIES {
+		new := &sequent{}
+
+		t := copyTopFormulaLevel(lastformula.Operands[1])
+		t.Index = lastformula.Index
+		new.Left = append(s.Left[:l-1], t)
+
+		t = copyTopFormulaLevel(lastformula.Operands[0])
+		t.Index = lastformula.Index
+		new.Right = append([]*formula{t}, s.Right...)
+
+		return new, nil
+	}
 	return nil, nil
 }
 
@@ -131,6 +146,19 @@ func (r r9) applyRuleTo(s *sequent) (*sequent, error) {
 
 func (r r10) applyRuleTo(s *sequent) (*sequent, error) {
 	return nil, nil
+}
+
+// Utility functions
+
+func copyTopFormulaLevel(src *formula) *formula {
+	dst := &formula{}
+
+	dst.Operator = src.Operator
+	dst.Operands = src.Operands
+	dst.Terminal = src.Terminal
+	dst.Index = src.Index
+
+	return dst
 }
 
 func formulaArrayToString(a []*formula) string {
