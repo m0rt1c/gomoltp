@@ -118,10 +118,12 @@ func (r r2) applyRuleTo(s *sequent) (*sequent, error) {
 	return nil, nil
 }
 
+// R3: If S <- |(p->q)|_{i},T then S <- |q|_{i},T
 func (r r3) applyRuleTo(s *sequent) (*sequent, error) {
 	return nil, nil
 }
 
+// R3: If S <- |(p->q)|_{i},T then S,|p|_{i} <- T
 func (r r4) applyRuleTo(s *sequent) (*sequent, error) {
 	return nil, nil
 }
