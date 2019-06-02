@@ -115,6 +115,7 @@ func (r r2) applyRuleTo(s *sequent) (*sequent, error) {
 		t.Index = lastformula.Index
 		new.Right = append([]*formula{t}, s.Right...)
 
+		new.Justification = append(s.Justification, s.Name)
 		return new, nil
 	}
 	return nil, nil
