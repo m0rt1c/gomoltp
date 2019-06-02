@@ -126,6 +126,21 @@ func (r r2) applyRuleTo(s *sequent) (*sequent, error) {
 
 // R3: If S <- |(p->q)|_{i},T then S <- |q|_{i},T
 func (r r3) applyRuleTo(s *sequent) (*sequent, error) {
+	l := len(s.Right)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Right[0]
+	if f.Terminal == sIMPLIES {
+		n := &sequent{}
+
+		t := copyTopFormulaLevel(f.Operands[1])
+		t.Index = f.Index
+		n.Right = append([]*formula{t}, s.Right...)
+		n.Left = s.Left
+
+		return n, nil
+	}
 	return nil, nil
 }
 
