@@ -97,8 +97,6 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	solution, err := moltp.Prove(rf, debugOn)
-
-	// err = json.NewEncoder(w).Encode(reports)
 	if err != nil {
 		log.Println("error solving", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -106,8 +104,21 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(solution)
+	rawSolution, err := moltp.EncodeSequentSlice(solution)
+	if err != nil {
+		log.Println("error tex encoding", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(infomessage{Info: fmt.Sprintf("error tex encoding: %s", err)})
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(*rawSolution)
+	if err != nil {
+		log.Println("error json encoding", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(infomessage{Info: fmt.Sprintf("error json encoding: %s", err)})
+		return
+	}
 }
 
 func main() {
