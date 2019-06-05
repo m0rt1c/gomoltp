@@ -214,7 +214,11 @@ func formulaArrayToString(a []*formula) string {
 }
 
 func (s *sequent) String() string {
-	return fmt.Sprintf("%s <- %s", formulaArrayToString(s.Left), formulaArrayToString(s.Right))
+	return fmt.Sprintf("%s: %s <- %s %v",
+		s.Name,
+		formulaArrayToString(s.Left),
+		formulaArrayToString(s.Right),
+		s.Justification)
 }
 
 func (f *formula) String() string {
