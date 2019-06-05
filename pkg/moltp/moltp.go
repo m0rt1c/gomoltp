@@ -411,11 +411,11 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 
 func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 	fmt.Printf("Solving formula: \n\t%s\n", f)
-	i := 0
+	i := 1
 	solution := []*sequent{}
 	unreduced := []*sequent{}
 	f.Index = "0"
-	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S0"})
+	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S1"})
 	for len(unreduced) > 0 {
 		if debugOn {
 			fmt.Println("Unreduced:")
@@ -427,7 +427,6 @@ func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 				fmt.Printf("\t%s\n", s)
 			}
 		}
-		ruleWasApplied := false
 
 		last := unreduced[len(unreduced)-1]
 		unreduced = unreduced[:len(unreduced)-1]
@@ -444,7 +443,7 @@ func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 				// The rule was applied successfully
 				i = i + 1
 				s.Name = fmt.Sprintf("S%d", i)
-				s.Justification = append(last.Justification, last.Name, rule.getName())
+				s.Justification = []string{rule.getName(), last.Name}
 
 				if len(s.Left) == 0 && len(s.Right) == 0 {
 					// A solution was found
@@ -452,13 +451,8 @@ func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 					return solution, nil
 				}
 				unreduced = append(unreduced, s)
-				ruleWasApplied = true
 			}
 			// else the rule was not appliable
-		}
-
-		if !ruleWasApplied {
-			return solution, fmt.Errorf("no rule was applied")
 		}
 
 		solution = append(solution, last)
