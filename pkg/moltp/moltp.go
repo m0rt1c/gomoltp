@@ -13,7 +13,7 @@ type (
 		Formula string `json:"formula"`
 	}
 
-	// RawSequent object holding a single unparsed sequent
+	// RawSequent object holding a single unparsed Sequent
 	// Left and right parts are encoded using a TEX notation
 	RawSequent struct {
 		Left  string `json:"left"`
@@ -25,7 +25,8 @@ type (
 		debugOn bool
 	}
 
-	sequent struct {
+	// Sequent object holding a Sequent
+	Sequent struct {
 		Name          string
 		Justification []string
 		Left          []*formula
@@ -103,7 +104,7 @@ func formulaArrayToString(a []*formula) string {
 	return out
 }
 
-func (s *sequent) String() string {
+func (s *Sequent) String() string {
 	return fmt.Sprintf("%s: %s <- %s %v",
 		s.Name,
 		formulaArrayToString(s.Left),
@@ -400,8 +401,8 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 	return formulas[0], nil
 }
 
-func encodeSequent(s *sequent) (*RawSequent, error) {
-	rs := &RawSequent{}
+func encodeSequent(s *Sequent) (RawSequent, error) {
+	rs := RawSequent{}
 
 	rs.Left = toTextRepr(formulaArrayToString(s.Left))
 	rs.Right = toTextRepr(formulaArrayToString(s.Right))
@@ -409,13 +410,12 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 	return rs, nil
 }
 
-func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
-	fmt.Printf("Solving formula: \n\t%s\n", f)
+func proveFormula(f *formula, debugOn bool) ([]*Sequent, error) {
 	i := 1
-	solution := []*sequent{}
-	unreduced := []*sequent{}
+	solution := []*Sequent{}
+	unreduced := []*Sequent{}
 	f.Index = "0"
-	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S1"})
+	unreduced = append(unreduced, &Sequent{Right: []*formula{f}, Name: "S1"})
 	for len(unreduced) > 0 {
 		if debugOn {
 			fmt.Println("Unreduced:")
@@ -461,7 +461,7 @@ func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
-func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
+func Prove(rf *RawFormula, debugOn bool) ([]*Sequent, error) {
 	if debugOn {
 		fmt.Printf("Input:\n\t%s\n", rf.Formula)
 	}
@@ -486,18 +486,23 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	s, err := proveFormula(top, debugOn)
 	if debugOn {
 		fmt.Println("Sequents:")
-		for _, sequent := range s {
-			fmt.Printf("\t%s\n", sequent)
+		for _, Sequent := range s {
+			fmt.Printf("\t%s\n", Sequent)
 		}
 	}
 	if err != nil {
 		return nil, err
 	}
-	rawSolution := make(map[int]*RawSequent)
-	for i, sequent := range s {
-		rs, err := encodeSequent(sequent)
+	return s, nil
+}
+
+// EncodeSequentSlice returns a map of latex encoded sequnets
+func EncodeSequentSlice(in []*Sequent) (*map[int]RawSequent, error) {
+	rawSolution := make(map[int]RawSequent)
+	for i, s := range in {
+		rs, err := encodeSequent(s)
 		if err != nil {
-			return &rawSolution, nil
+			return &rawSolution, err
 		}
 		rawSolution[i] = rs
 	}
