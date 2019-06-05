@@ -416,7 +416,7 @@ func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 	unreduced := []*sequent{}
 	f.Index = "0"
 	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S0"})
-	for m := 0; m < 3; m++ {
+	for len(unreduced) > 0 {
 		if debugOn {
 			fmt.Println("Unreduced:")
 			for _, u := range unreduced {
