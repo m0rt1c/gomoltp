@@ -574,13 +574,20 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 	return rs, nil
 }
 
-func proveFormula(f *formula) (*map[int]*sequent, error) {
+func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
+	fmt.Printf("Solving formula: %s\n", f)
 	i := 0
 	solution := make(map[int]*sequent)
 	unreduced := []*sequent{}
 	f.Index = "0"
 	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S0"})
 	for len(unreduced) > 0 {
+		if debugOn {
+			fmt.Println("Unreduced:")
+			fmt.Println(unreduced)
+			fmt.Println("Partial Solution:")
+			fmt.Println(solution)
+		}
 		ruleWasApplied := false
 		// Try to apply each rule
 		for _, rule := range rules {
@@ -590,13 +597,17 @@ func proveFormula(f *formula) (*map[int]*sequent, error) {
 				return &solution, err
 			}
 			if s != nil {
+				if debugOn {
+					fmt.Printf("Rule %s\n", rule.getName())
+				}
 				// The rule was applied successfully
-				i = i + 1
 				s.Name = fmt.Sprintf("S%d", i)
+				s.Justification = append(last.Justification, last.Name, rule.getName())
 				solution[i] = last
+				i = i + 1
+
 				if len(s.Left) == 0 && len(s.Right) == 0 {
 					// A solution was found
-					i = i + 1
 					solution[i] = s
 					return &solution, nil
 				}
@@ -635,7 +646,7 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	if err != nil {
 		return nil, err
 	}
-	s, err := proveFormula(top)
+	s, err := proveFormula(top, debugOn)
 	if debugOn {
 		fmt.Println("Sequents:")
 		for key := 0; key < len(*s); key++ {
