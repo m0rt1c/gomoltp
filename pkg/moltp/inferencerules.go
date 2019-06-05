@@ -1,5 +1,7 @@
 package moltp
 
+import "fmt"
+
 var (
 	rules = []inferenceRule{r1{Name: "R1"}, r2{Name: "R2"}, r3{Name: "R3"}, r4{Name: "R4"}, r5{Name: "R5"}, r6{Name: "R6"}, r7{Name: "R7"}, r8{Name: "R8"}, r9{Name: "R9"}, r10{Name: "R10"}}
 )
@@ -128,28 +130,94 @@ func (r r4) getName() string {
 	return r.Name
 }
 
+// R5: If S,| not p|_{i} <- T then S <- |p|_{i},T
 func (r r5) applyRuleTo(s *sequent) (*sequent, error) {
+	l := len(s.Left)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Left[l-1]
+	if f.Terminal == sNOT {
+		n := &sequent{}
+
+		t := copyTopFormulaLevel(f.Operands[0])
+		t.Index = f.Index
+		n.Right = append([]*formula{t}, s.Right...)
+		n.Left = s.Left[:l-1]
+
+		return n, nil
+	}
 	return nil, nil
 }
 func (r r5) getName() string {
 	return r.Name
 }
 
+// R6: If S <- |not p|_{i},T then S,|p|_{i} <- T
 func (r r6) applyRuleTo(s *sequent) (*sequent, error) {
+	l := len(s.Right)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Right[0]
+	if f.Terminal == sNOT {
+		n := &sequent{}
+
+		t := copyTopFormulaLevel(f.Operands[0])
+		t.Index = f.Index
+		n.Left = append(s.Left, t)
+		n.Right = s.Right[1:]
+
+		return n, nil
+	}
 	return nil, nil
 }
 func (r r6) getName() string {
 	return r.Name
 }
 
+// R7: If S <- | Box p|_{i},T then S <- |p|_{n:i},T
 func (r r7) applyRuleTo(s *sequent) (*sequent, error) {
+	l := len(s.Right)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Right[0]
+	if f.Terminal == sBOX {
+		n := &sequent{}
+
+		t := copyTopFormulaLevel(f.Operands[0])
+		// TODO: Implement corret world index value
+		t.Index = fmt.Sprintf("w:%s", f.Index)
+		n.Left = s.Left
+		n.Right = append([]*formula{t}, s.Right[1:]...)
+
+		return n, nil
+	}
 	return nil, nil
 }
 func (r r7) getName() string {
 	return r.Name
 }
 
+// R8: If S,|Box p|_{i} <- T then S,|p|_{w:i} <- T
 func (r r8) applyRuleTo(s *sequent) (*sequent, error) {
+	l := len(s.Left)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Left[l-1]
+	if f.Terminal == sBOX {
+		n := &sequent{}
+
+		t := copyTopFormulaLevel(f.Operands[0])
+		// TODO: Implement corret world index value
+		t.Index = f.Index
+		n.Left = append(s.Left[:l-1], t)
+		n.Right = s.Right
+
+		return n, nil
+	}
 	return nil, nil
 }
 func (r r8) getName() string {
