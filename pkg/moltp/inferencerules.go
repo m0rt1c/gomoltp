@@ -94,7 +94,7 @@ func (r r3) applyRuleTo(s *sequent) (*sequent, error) {
 
 		t := copyTopFormulaLevel(f.Operands[1])
 		t.Index = f.Index
-		n.Right = append([]*formula{t}, s.Right...)
+		n.Right = append([]*formula{t}, s.Right[1:]...)
 		n.Left = s.Left
 
 		return n, nil
