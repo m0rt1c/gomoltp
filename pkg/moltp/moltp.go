@@ -574,10 +574,10 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 	return rs, nil
 }
 
-func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
+func proveFormula(f *formula, debugOn bool) ([]*sequent, error) {
 	fmt.Printf("Solving formula: \n\t%s\n", f)
 	i := 0
-	solution := make(map[int]*sequent)
+	solution := []*sequent{}
 	unreduced := []*sequent{}
 	f.Index = "0"
 	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S0"})
@@ -600,7 +600,7 @@ func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
 		for _, rule := range rules {
 			s, err := rule.applyRuleTo(last)
 			if err != nil {
-				return &solution, err
+				return solution, err
 			}
 			if s != nil {
 				if debugOn {
@@ -613,8 +613,8 @@ func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
 
 				if len(s.Left) == 0 && len(s.Right) == 0 {
 					// A solution was found
-					solution[len(solution)] = s
-					return &solution, nil
+					solution = append(solution, s)
+					return solution, nil
 				}
 				unreduced = append(unreduced, s)
 				ruleWasApplied = true
@@ -623,12 +623,12 @@ func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
 		}
 
 		if !ruleWasApplied {
-			return &solution, fmt.Errorf("no rule was applied")
+			return solution, fmt.Errorf("no rule was applied")
 		}
 
-		solution[len(solution)] = last
+		solution = append(solution, last)
 	}
-	return &solution, nil
+	return solution, nil
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
@@ -657,11 +657,7 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	s, err := proveFormula(top, debugOn)
 	if debugOn {
 		fmt.Println("Sequents:")
-		for key := 0; key < len(*s); key++ {
-			sequent, ok := (*s)[key]
-			if !ok {
-				continue
-			}
+		for _, sequent := range s {
 			fmt.Printf("\t%s\n", sequent)
 		}
 	}
@@ -669,12 +665,12 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 		return nil, err
 	}
 	rawSolution := make(map[int]*RawSequent)
-	for key, sequent := range *s {
+	for i, sequent := range s {
 		rs, err := encodeSequent(sequent)
 		if err != nil {
 			return &rawSolution, nil
 		}
-		rawSolution[key] = rs
+		rawSolution[i] = rs
 	}
 	return &rawSolution, nil
 }
