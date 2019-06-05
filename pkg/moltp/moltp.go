@@ -20,6 +20,11 @@ type (
 		Right string `json:"right"`
 	}
 
+	// Prover object holding the prover state
+	Prover struct {
+		debugOn bool
+	}
+
 	sequent struct {
 		Name          string
 		Justification []string
