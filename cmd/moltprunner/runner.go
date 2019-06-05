@@ -25,8 +25,8 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	} else {
-		for key, sequent := range *solution {
-			fmt.Printf("%d: %s\n", key, sequent)
+		for _, s := range solution {
+			fmt.Printf("%s\n", s)
 		}
 	}
 }
