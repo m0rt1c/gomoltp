@@ -575,40 +575,45 @@ func encodeSequent(s *sequent) (*RawSequent, error) {
 }
 
 func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
-	fmt.Printf("Solving formula: %s\n", f)
+	fmt.Printf("Solving formula: \n\t%s\n", f)
 	i := 0
 	solution := make(map[int]*sequent)
 	unreduced := []*sequent{}
 	f.Index = "0"
 	unreduced = append(unreduced, &sequent{Right: []*formula{f}, Name: "S0"})
-	for len(unreduced) > 0 {
+	for m := 0; m < 3; m++ {
 		if debugOn {
 			fmt.Println("Unreduced:")
-			fmt.Println(unreduced)
+			for _, u := range unreduced {
+				fmt.Printf("\t%s\n", u)
+			}
 			fmt.Println("Partial Solution:")
-			fmt.Println(solution)
+			for _, s := range solution {
+				fmt.Printf("\t%s\n", s)
+			}
 		}
 		ruleWasApplied := false
+
+		last := unreduced[len(unreduced)-1]
+		unreduced = unreduced[:len(unreduced)-1]
 		// Try to apply each rule
 		for _, rule := range rules {
-			last := unreduced[len(unreduced)-1]
 			s, err := rule.applyRuleTo(last)
 			if err != nil {
 				return &solution, err
 			}
 			if s != nil {
 				if debugOn {
-					fmt.Printf("Rule %s\n", rule.getName())
+					fmt.Printf("Rule %s was applied\n", rule.getName())
 				}
 				// The rule was applied successfully
+				i = i + 1
 				s.Name = fmt.Sprintf("S%d", i)
 				s.Justification = append(last.Justification, last.Name, rule.getName())
-				solution[i] = last
-				i = i + 1
 
 				if len(s.Left) == 0 && len(s.Right) == 0 {
 					// A solution was found
-					solution[i] = s
+					solution[len(solution)] = s
 					return &solution, nil
 				}
 				unreduced = append(unreduced, s)
@@ -616,9 +621,12 @@ func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
 			}
 			// else the rule was not appliable
 		}
+
 		if !ruleWasApplied {
 			return &solution, fmt.Errorf("no rule was applied")
 		}
+
+		solution[len(solution)] = last
 	}
 	return &solution, nil
 }
@@ -626,13 +634,13 @@ func proveFormula(f *formula, debugOn bool) (*map[int]*sequent, error) {
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
 func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	if debugOn {
-		fmt.Printf("Input:\n%s\n", rf.Formula)
+		fmt.Printf("Input:\n\t%s\n", rf.Formula)
 	}
 	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
 	if debugOn {
 		fmt.Println("Tokens:")
 		for i := len(tokens) - 1; i >= 0; i-- {
-			fmt.Printf("%d: %s\n", len(tokens)-i, tokens[i].Value)
+			fmt.Printf("\t%d: %s\n", len(tokens)-i, tokens[i].Value)
 		}
 	}
 	if err != nil {
@@ -641,7 +649,7 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 	top, err := genFormulasTree(tokens)
 	if debugOn {
 		fmt.Println("Formula:")
-		fmt.Println(top)
+		fmt.Printf("\t%s\n", top)
 	}
 	if err != nil {
 		return nil, err
@@ -654,7 +662,7 @@ func Prove(rf *RawFormula, debugOn bool) (*map[int]*RawSequent, error) {
 			if !ok {
 				continue
 			}
-			fmt.Println(sequent)
+			fmt.Printf("\t%s\n", sequent)
 		}
 	}
 	if err != nil {
