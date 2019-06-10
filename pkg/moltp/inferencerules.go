@@ -44,6 +44,14 @@ type (
 	}
 )
 
+func munify(f1, f2 *formula) (string, bool) {
+	return "", false
+}
+
+func sub(fs []*formula, g string) []*formula {
+	return []*formula{}
+}
+
 // this functions rapresenting inference rules returns
 // 1) a Sequent and a nil if the rule was applied successfully. The returned Sequent is the result of applying the rule
 // 2) nil and nil if the Sequent was not appliable
@@ -52,6 +60,33 @@ type (
 // R1: If S,|p|_{i} <- T and S' <- |q|_{j}, T' and |p|_{i} and |q|_{j}
 // unify with unification O then S_{O} U S'_{O} <- T_{O} U T'_{O}
 func (r r1) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
+	for _, s1 := range *sequents {
+		l1 := len(s1.Left)
+		if l1 < 1 {
+			continue
+		}
+		f1 := s1.Left[l1-1]
+		if len(f1.Operands) == 0 { // This means it is an atomic formula
+			for _, s2 := range *sequents {
+				l2 := len(s2.Right)
+				if l2 < 1 {
+					continue
+				}
+				f2 := s2.Right[0]
+				if len(f2.Operands) == 0 {
+					g, ok := munify(f1, f2)
+					if ok {
+						n := &Sequent{}
+
+						n.Left = append(sub(s1.Left[:l1-1], g), sub(s2.Left, g)...)
+						n.Right = append(sub(s1.Right, g), sub(s2.Right[0:], g)...)
+
+						return n, nil
+					}
+				}
+			}
+		}
+	}
 	return nil, nil
 }
 func (r r1) getName() string {
