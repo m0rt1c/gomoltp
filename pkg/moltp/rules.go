@@ -44,10 +44,6 @@ type (
 	}
 )
 
-func munify(f1, f2 *formula) (string, bool) {
-	return "", false
-}
-
 func sub(fs []*formula, g string) []*formula {
 	return []*formula{}
 }
