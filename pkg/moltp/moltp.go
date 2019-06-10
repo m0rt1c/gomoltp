@@ -6,62 +6,6 @@ import (
 	"sync"
 )
 
-type (
-	// RawFormula object holding a single unparsed formula encoded using a TEX notation
-	RawFormula struct {
-		OID     int    `json:"oid"`
-		Formula string `json:"formula"`
-	}
-
-	// RawSequent object holding a single unparsed Sequent
-	// Left and right parts are encoded using a TEX notation
-	RawSequent struct {
-		Left  string `json:"left"`
-		Right string `json:"right"`
-	}
-
-	// Prover object holding the prover state
-	Prover struct {
-		debugOn bool
-	}
-
-	// Sequent object holding a Sequent
-	Sequent struct {
-		Name          string
-		Justification []string
-		Left          []*formula
-		Right         []*formula
-	}
-
-	token struct {
-		Value string // token symbol value
-		IsTe  bool   // is terminal
-		IsIn  bool   // is an index for a terminal
-		IsLB  bool   // is left braket
-		IsRB  bool   // is right braket
-		IsOp  bool   // is operator
-		UnOp  bool   // is unary operator
-		BiOp  bool   // is binary oprator
-		MuOp  bool   // is miltiple arguments operator
-		IsCo  bool   // is comma for multiple args operators
-		Skip  int    // how many char was have to be skipped from input
-	}
-
-	operator interface {
-		apply(ops []*formula) bool
-	}
-
-	or struct {
-	}
-
-	formula struct {
-		Operator operator
-		Operands []*formula
-		Terminal string
-		Index    string
-	}
-)
-
 const (
 	sBOX     = "Box"
 	sDIAMOND = "Diamond"
@@ -84,7 +28,6 @@ var (
 func copyTopFormulaLevel(src *formula) *formula {
 	dst := &formula{}
 
-	dst.Operator = src.Operator
 	dst.Operands = src.Operands
 	dst.Terminal = src.Terminal
 	dst.Index = src.Index
@@ -102,51 +45,6 @@ func formulaArrayToString(a []*formula) string {
 		}
 	}
 	return out
-}
-
-func (s *Sequent) String() string {
-	return fmt.Sprintf("%s: %s <- %s %v",
-		s.Name,
-		formulaArrayToString(s.Left),
-		formulaArrayToString(s.Right),
-		s.Justification)
-}
-
-func (f *formula) String() string {
-	switch len(f.Operands) {
-	case 0:
-		if len(f.Index) < 1 {
-			return fmt.Sprintf("%s", f.Terminal)
-		}
-		return fmt.Sprintf("%s_{%s}", f.Terminal, f.Index)
-	case 1:
-		if len(f.Index) < 1 {
-			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
-		}
-		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], f.Index)
-	case 2:
-		if len(f.Index) < 1 {
-			return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
-		}
-		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], f.Index)
-	default:
-		k := ""
-		for _, o := range f.Operands {
-			if k == "" {
-				k = fmt.Sprintf("%s", o)
-			} else {
-				k = fmt.Sprintf("%s, %s", k, o)
-			}
-		}
-		if len(f.Index) < 1 {
-			return fmt.Sprintf("( %s %s )", f.Terminal, k)
-		}
-		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, k, f.Index)
-	}
-}
-
-func (or) apply(ops []*formula) bool {
-	return false
 }
 
 func operatorPreceeds(a, b *token) bool {
@@ -258,11 +156,6 @@ func matchOperator(o, t byte) *token {
 	return nil
 }
 
-func genOperator(s string) operator {
-	op := or{}
-	return op
-}
-
 func nextToken(s string) (*token, error) {
 	switch s[0] {
 	case '(':
@@ -371,7 +264,6 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 				}
 				f := &formula{}
 				f.Terminal = t.Value
-				f.Operator = genOperator(t.Value)
 				f.Operands = append(f.Operands, formulas[len(formulas)-2:]...)
 				formulas = formulas[:len(formulas)-2]
 				formulas = append(formulas, f)
@@ -382,7 +274,6 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 				}
 				f := &formula{}
 				f.Terminal = t.Value
-				f.Operator = genOperator(t.Value)
 				f.Operands = append(f.Operands, formulas[len(formulas)-1:]...)
 				formulas = formulas[:len(formulas)-1]
 				formulas = append(formulas, f)

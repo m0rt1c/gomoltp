@@ -44,10 +44,6 @@ type (
 	}
 )
 
-func sub(fs []*formula, g string) []*formula {
-	return []*formula{}
-}
-
 // this functions rapresenting inference rules returns
 // 1) a Sequent and a nil if the rule was applied successfully. The returned Sequent is the result of applying the rule
 // 2) nil and nil if the Sequent was not appliable
@@ -70,12 +66,17 @@ func (r r1) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 				}
 				f2 := s2.Right[0]
 				if len(f2.Operands) == 0 {
-					g, ok := munify(f1, f2)
+					g, ok := f1.munify(f2)
 					if ok {
 						n := &Sequent{}
 
-						n.Left = append(sub(s1.Left[:l1-1], g), sub(s2.Left, g)...)
-						n.Right = append(sub(s1.Right, g), sub(s2.Right[0:], g)...)
+						t1 := g.applySubstitutionTo(s1.Left[:l1-1])
+						t2 := g.applySubstitutionTo(s2.Left)
+						n.Left = append(t1, t2...)
+
+						t1 = g.applySubstitutionTo(s1.Right)
+						t2 = g.applySubstitutionTo(s2.Right[0:])
+						n.Right = append(t1, t2...)
 
 						return n, nil
 					}
