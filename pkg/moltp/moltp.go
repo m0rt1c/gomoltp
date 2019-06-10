@@ -24,7 +24,6 @@ var (
 )
 
 // Utility functions
-
 func copyTopFormulaLevel(src *formula) *formula {
 	dst := &formula{}
 
