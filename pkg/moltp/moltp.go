@@ -432,7 +432,7 @@ func proveFormula(f *formula, debugOn bool) ([]*Sequent, error) {
 		unreduced = unreduced[:len(unreduced)-1]
 		// Try to apply each rule
 		for _, rule := range rules {
-			s, err := rule.applyRuleTo(last)
+			s, err := rule.applyRuleTo(&unreduced)
 			if err != nil {
 				return solution, err
 			}
