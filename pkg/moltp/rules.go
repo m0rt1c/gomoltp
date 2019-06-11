@@ -66,8 +66,8 @@ func (r r1) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 				}
 				f2 := s2.Right[0]
 				if len(f2.Operands) == 0 {
-					g, ok := f1.munify(f2)
-					if ok {
+					g := f1.munify(f2)
+					if g != nil {
 						n := &Sequent{}
 
 						t1 := g.applySubstitutionTo(s1.Left[:l1-1])

@@ -48,8 +48,9 @@ type (
 	substitution struct{}
 
 	worldsymbol struct {
-		Value string
-		Index int
+		Value  string
+		Index  int
+		Ground bool
 	}
 
 	worldindex struct {
@@ -104,30 +105,46 @@ func (f *formula) String() string {
 	}
 }
 
-func (i *worldsymbol) ground() bool {
-	return false
-}
-
 func (i *worldindex) ground() bool {
-	return false
+	for _, s := range i.Symbols {
+		if !s.Ground {
+			return false
+		}
+	}
+	return true
 }
 
 func (i *worldindex) start() worldsymbol {
-	return worldsymbol{}
+	if len(i.Symbols) < 1 {
+		// TODO should we return an error here?
+		return worldsymbol{}
+	}
+	return i.Symbols[0]
 }
 
 func (i *worldindex) end() worldsymbol {
-	return worldsymbol{}
+	l := len(i.Symbols)
+	if l < 1 {
+		// TODO should we return an error here?
+		return worldsymbol{}
+	}
+	return i.Symbols[l-1]
 }
 
-func (i *worldindex) wunify(j *worldindex) (*unification, bool) {
-	return &unification{}, false
+func (i *worldindex) wunify(j *worldindex) *unification {
+	if i.start().Value == "0" && j.start().Value == "0" {
+		if i.end().Ground && j.end().Ground && i.end().Value == j.end().Value {
+			return &unification{}
+		}
+		// TODO implement the rest
+	}
+	return nil
 }
 
-func (f *formula) munify(g *formula) (*substitution, bool) {
-	return &substitution{}, false
+func (f *formula) munify(g *formula) *substitution {
+	return nil
 }
 
 func (g *substitution) applySubstitutionTo(fs []*formula) []*formula {
-	return []*formula{}
+	return fs
 }
