@@ -253,6 +253,18 @@ func tokenize(s string, term byte) ([]*token, error) {
 	return tokens, nil
 }
 
+func reduceFormulas(f *formula) *formula {
+	switch f.Terminal {
+	case sDIAMOND:
+		// \Diamond A = \lnot \Box \lnot A
+		g0 := &formula{Terminal: sNOT, Operands: []*formula{f}}
+		g1 := &formula{Terminal: sBOX, Operands: []*formula{g0}}
+		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
+	default:
+		return f
+	}
+}
+
 func genFormulasTree(tokens []*token) (*formula, error) {
 	var formulas []*formula
 	for _, t := range tokens {
@@ -288,7 +300,7 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 			formulas[len(formulas)-1].Index = t.Value
 		}
 	}
-	return formulas[0], nil
+	return reduceFormulas(formulas[0]), nil
 }
 
 func encodeSequent(s *Sequent) (RawSequent, error) {
