@@ -98,7 +98,7 @@ func (r r2) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 		return nil, nil
 	}
 	f := s.Left[l-1]
-	if f.Terminal == sIMPLIES {
+	if f.Terminal == sIMPLY {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[1])
@@ -125,7 +125,7 @@ func (r r3) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 		return nil, nil
 	}
 	f := s.Right[0]
-	if f.Terminal == sIMPLIES {
+	if f.Terminal == sIMPLY {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[1])
@@ -149,7 +149,7 @@ func (r r4) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 		return nil, nil
 	}
 	f := s.Right[0]
-	if f.Terminal == sIMPLIES {
+	if f.Terminal == sIMPLY {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])

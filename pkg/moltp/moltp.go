@@ -12,7 +12,7 @@ const (
 	sEXISTS  = "Exists"
 	sFORALL  = "Forall"
 	sIFF     = "Iff"
-	sIMPLIES = "Implies"
+	sIMPLY   = "Implies"
 	sAND     = "And"
 	sOR      = "Or"
 	sNOT     = "Not"
@@ -61,7 +61,7 @@ func operatorPreceeds(a, b *token) bool {
 				return false
 			case sAND:
 				return true
-			case sIMPLIES:
+			case sIMPLY:
 				return true
 			case sIFF:
 				return true
@@ -72,18 +72,18 @@ func operatorPreceeds(a, b *token) bool {
 				return false
 			case sAND:
 				return false
-			case sIMPLIES:
+			case sIMPLY:
 				return true
 			case sIFF:
 				return true
 			}
-		case sIMPLIES:
+		case sIMPLY:
 			switch b.Value {
 			case sOR:
 				return false
 			case sAND:
 				return false
-			case sIMPLIES:
+			case sIMPLY:
 				return false
 			case sIFF:
 				return true
@@ -114,7 +114,7 @@ func initsEncoding() {
 	sEncoding[sEXISTS] = "\\exists"
 	sEncoding[sFORALL] = "\\forall"
 	sEncoding[sIFF] = "\\iff"
-	sEncoding[sIMPLIES] = "\\to"
+	sEncoding[sIMPLY] = "\\to"
 	sEncoding[sAND] = "\\land"
 	sEncoding[sOR] = "\\lor"
 	sEncoding[sNOT] = "\\lnot"
@@ -142,7 +142,7 @@ func matchOperator(o, t byte) *token {
 	case 'i':
 		return &token{IsOp: true, BiOp: true, Value: sIFF, Skip: len("\\iff")}
 	case 't':
-		return &token{IsOp: true, BiOp: true, Value: sIMPLIES, Skip: len("\\to")}
+		return &token{IsOp: true, BiOp: true, Value: sIMPLY, Skip: len("\\to")}
 	}
 	switch t {
 	case 'a':
@@ -269,7 +269,7 @@ func reduceFormulas(f *formula) *formula {
 		A := f.Operands[0]
 		B := f.Operands[1]
 		g0 := &formula{Terminal: sNOT, Operands: []*formula{B}}
-		g1 := &formula{Terminal: sIMPLIES, Operands: []*formula{A, g0}}
+		g1 := &formula{Terminal: sIMPLY, Operands: []*formula{A, g0}}
 		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
 	default:
 		return f
