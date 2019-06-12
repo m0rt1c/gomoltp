@@ -350,9 +350,13 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 			for _, u := range unreduced {
 				fmt.Printf("\t%s\n", u)
 			}
-			fmt.Println("Partial Solution:")
-			for _, s := range solution {
-				fmt.Printf("\t%s\n", s)
+			if len(solution) < 1 {
+				fmt.Println("Solution is empty")
+			} else {
+				fmt.Println("Partial Solution:")
+				for _, s := range solution {
+					fmt.Printf("\t%s\n", s)
+				}
 			}
 		}
 
