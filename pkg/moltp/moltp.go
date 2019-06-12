@@ -264,6 +264,13 @@ func reduceFormulas(f *formula) *formula {
 		g0 := &formula{Terminal: sNOT, Operands: []*formula{A}}
 		g1 := &formula{Terminal: sBOX, Operands: []*formula{g0}}
 		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
+	case sAND:
+		// A \land B = \lnot ( A \to \lnot B )
+		A := f.Operands[0]
+		B := f.Operands[1]
+		g0 := &formula{Terminal: sNOT, Operands: []*formula{B}}
+		g1 := &formula{Terminal: sIMPLIES, Operands: []*formula{A, g0}}
+		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
 	default:
 		return f
 	}
