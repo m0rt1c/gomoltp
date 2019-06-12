@@ -2,10 +2,6 @@ package moltp
 
 import "fmt"
 
-var (
-	rules = []inferenceRule{r1{Name: "R1"}, r2{Name: "R2"}, r3{Name: "R3"}, r4{Name: "R4"}, r5{Name: "R5"}, r6{Name: "R6"}, r7{Name: "R7"}, r8{Name: "R8"}, r9{Name: "R9"}, r10{Name: "R10"}}
-)
-
 type (
 	inferenceRule interface {
 		getName() string

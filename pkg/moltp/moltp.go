@@ -338,14 +338,14 @@ func encodeSequent(s *Sequent) (RawSequent, error) {
 	return rs, nil
 }
 
-func proveFormula(f *formula, debugOn bool) ([]*Sequent, error) {
+func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 	i := 1
 	solution := []*Sequent{}
 	unreduced := []*Sequent{}
 	f.Index = &worldindex{[]*worldsymbol{&worldsymbol{Ground: true, Value: "0"}}}
 	unreduced = append(unreduced, &Sequent{Right: []*formula{f}, Name: "S1"})
 	for len(unreduced) > 0 {
-		if debugOn {
+		if p.Debug {
 			fmt.Println("Unreduced:")
 			for _, u := range unreduced {
 				fmt.Printf("\t%s\n", u)
@@ -359,13 +359,13 @@ func proveFormula(f *formula, debugOn bool) ([]*Sequent, error) {
 		last := unreduced[len(unreduced)-1]
 		unreduced = unreduced[:len(unreduced)-1]
 		// Try to apply each rule
-		for _, rule := range rules {
+		for _, rule := range p.Rules {
 			s, err := rule.applyRuleTo(&unreduced)
 			if err != nil {
 				return solution, err
 			}
 			if s != nil {
-				if debugOn {
+				if p.Debug {
 					fmt.Printf("Rule %s was applied\n", rule.getName())
 				}
 				// The rule was applied successfully
@@ -389,12 +389,13 @@ func proveFormula(f *formula, debugOn bool) ([]*Sequent, error) {
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
-func Prove(rf *RawFormula, debugOn bool) ([]*Sequent, error) {
-	if debugOn {
+func (p *Prover) Prove(rf *RawFormula) ([]*Sequent, error) {
+	p.initRules()
+	if p.Debug {
 		fmt.Printf("Input:\n\t%s\n", rf.Formula)
 	}
 	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
-	if debugOn {
+	if p.Debug {
 		fmt.Println("Tokens:")
 		for i := len(tokens) - 1; i >= 0; i-- {
 			fmt.Printf("\t%d: %s\n", len(tokens)-i, tokens[i].Value)
@@ -404,15 +405,15 @@ func Prove(rf *RawFormula, debugOn bool) ([]*Sequent, error) {
 		return nil, err
 	}
 	top, err := genFormulasTree(tokens)
-	if debugOn {
+	if p.Debug {
 		fmt.Println("Formula:")
 		fmt.Printf("\t%s\n", top)
 	}
 	if err != nil {
 		return nil, err
 	}
-	s, err := proveFormula(top, debugOn)
-	if debugOn {
+	s, err := p.proveFormula(top)
+	if p.Debug {
 		fmt.Println("Sequents:")
 		for _, Sequent := range s {
 			fmt.Printf("\t%s\n", Sequent)
