@@ -321,9 +321,9 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 		}
 		if t.IsIn {
 			if len(formulas) < 1 {
-				return formulas[0], fmt.Errorf("trying to assign idex %s to nothing", t.Value)
+				return formulas[0], fmt.Errorf("trying to assign index %s to nothing", t.Value)
 			}
-			formulas[len(formulas)-1].Index = t.Value
+			formulas[len(formulas)-1].Index = &worldindex{[]*worldsymbol{&worldsymbol{Ground: true, Value: t.Value}}}
 		}
 	}
 	return reduceFormulas(formulas[0]), nil
@@ -342,7 +342,7 @@ func proveFormula(f *formula, debugOn bool) ([]*Sequent, error) {
 	i := 1
 	solution := []*Sequent{}
 	unreduced := []*Sequent{}
-	f.Index = "0"
+	f.Index = &worldindex{[]*worldsymbol{&worldsymbol{Ground: true, Value: "0"}}}
 	unreduced = append(unreduced, &Sequent{Right: []*formula{f}, Name: "S1"})
 	for len(unreduced) > 0 {
 		if debugOn {

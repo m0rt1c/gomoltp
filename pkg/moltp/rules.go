@@ -11,36 +11,45 @@ type (
 		getName() string
 		applyRuleTo(sequents *[]*Sequent) (*Sequent, error)
 	}
-
 	r1 struct {
 		Name string
+		R    *relation
 	}
 	r2 struct {
 		Name string
+		R    *relation
 	}
 	r3 struct {
 		Name string
+		R    *relation
 	}
 	r4 struct {
 		Name string
+		R    *relation
 	}
 	r5 struct {
 		Name string
+		R    *relation
 	}
 	r6 struct {
 		Name string
+		R    *relation
 	}
 	r7 struct {
 		Name string
+		R    *relation
 	}
 	r8 struct {
 		Name string
+		R    *relation
 	}
 	r9 struct {
 		Name string
+		R    *relation
 	}
 	r10 struct {
 		Name string
+		R    *relation
 	}
 )
 
@@ -66,7 +75,7 @@ func (r r1) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 				}
 				f2 := s2.Right[0]
 				if len(f2.Operands) == 0 {
-					g := f1.munify(f2)
+					g := r.R.munify(f1, f2)
 					if g != nil {
 						n := &Sequent{}
 
@@ -225,8 +234,15 @@ func (r r7) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		// TODO: Implement corret world index value
-		t.Index = fmt.Sprintf("w:%s", f.Index)
+		ns := &worldsymbol{}
+		ns.Ground = true
+		if t.Index.isGround() {
+			ns.Value = fmt.Sprintf("%d", len(t.Index.Symbols)+1)
+		} else {
+			// TODO: Implement corret world index value
+			ns.Value = fmt.Sprintf("f(w_%d)", len(t.Index.Symbols)+1)
+		}
+		t.Index.Symbols = append([]*worldsymbol{ns}, t.Index.Symbols...)
 		n.Left = s.Left
 		n.Right = append([]*formula{t}, s.Right[1:]...)
 

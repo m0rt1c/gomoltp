@@ -19,6 +19,8 @@ type (
 	// Prover object holding the prover state
 	Prover struct {
 		debugOn bool
+		Rules   []inferenceRule
+		R       *relation
 	}
 
 	// Sequent object holding a Sequent
@@ -126,7 +128,7 @@ func (i *worldindex) String() string {
 	case 0:
 		return ""
 	case 1:
-		return fmt.Sprint("%s", i.Symbols[0])
+		return fmt.Sprintf("%s", i.Symbols[0])
 	default:
 		out := fmt.Sprintf("%s", i.Symbols[0])
 		for _, k := range i.Symbols {
