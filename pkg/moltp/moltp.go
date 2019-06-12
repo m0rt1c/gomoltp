@@ -254,6 +254,9 @@ func tokenize(s string, term byte) ([]*token, error) {
 }
 
 func reduceFormulas(f *formula) *formula {
+	for _, g := range f.Operands {
+		reduceFormulas(g)
+	}
 	switch f.Terminal {
 	case sDIAMOND:
 		// \Diamond A = \lnot \Box \lnot A
