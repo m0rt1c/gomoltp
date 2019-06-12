@@ -71,7 +71,7 @@ type (
 	formula struct {
 		Operands []*formula
 		Terminal string
-		Index    *worldindex
+		Index    worldindex
 	}
 )
 
@@ -145,7 +145,7 @@ func unify(f, g *formula) *unification {
 func (R *relation) munify(f, g *formula) *substitution {
 	o := unify(f, g)
 	if o != nil {
-		n := R.wunify(f.Index, g.Index)
+		n := R.wunify(&f.Index, &g.Index)
 		if n != nil {
 			return &substitution{}
 		}
