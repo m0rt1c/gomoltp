@@ -43,9 +43,18 @@ type (
 		Skip  int    // how many char was have to be skipped from input
 	}
 
-	unification struct{}
+	unification struct {
+		List []substitution
+	}
 
-	substitution struct{}
+	substitution struct {
+		Old *worldsymbol
+		New *worldsymbol
+	}
+
+	relation struct {
+		Serial bool
+	}
 
 	worldsymbol struct {
 		Value  string
@@ -54,13 +63,13 @@ type (
 	}
 
 	worldindex struct {
-		Symbols []worldsymbol
+		Symbols []*worldsymbol
 	}
 
 	formula struct {
 		Operands []*formula
 		Terminal string
-		Index    string
+		Index    *worldindex
 	}
 )
 
@@ -75,17 +84,17 @@ func (s *Sequent) String() string {
 func (f *formula) String() string {
 	switch len(f.Operands) {
 	case 0:
-		if len(f.Index) < 1 {
+		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("%s", f.Terminal)
 		}
 		return fmt.Sprintf("%s_{%s}", f.Terminal, f.Index)
 	case 1:
-		if len(f.Index) < 1 {
+		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
 		}
 		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], f.Index)
 	case 2:
-		if len(f.Index) < 1 {
+		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
 		}
 		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], f.Index)
@@ -98,14 +107,72 @@ func (f *formula) String() string {
 				k = fmt.Sprintf("%s, %s", k, o)
 			}
 		}
-		if len(f.Index) < 1 {
+		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, k)
 		}
 		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, k, f.Index)
 	}
 }
 
-func (i *worldindex) ground() bool {
+func (s *worldsymbol) String() string {
+	if s.Ground {
+		return s.Value
+	}
+	return fmt.Sprintf("%s_%d", s.Value, s.Index)
+}
+
+func (i *worldindex) String() string {
+	switch len(i.Symbols) {
+	case 0:
+		return ""
+	case 1:
+		return fmt.Sprint("%s", i.Symbols[0])
+	default:
+		out := fmt.Sprintf("%s", i.Symbols[0])
+		for _, k := range i.Symbols {
+			out = fmt.Sprintf("%s:%s", out, k)
+		}
+		return out
+	}
+}
+
+func unify(f, g *formula) *unification {
+	return nil
+}
+
+func (R *relation) munify(f, g *formula) *substitution {
+	o := unify(f, g)
+	if o != nil {
+		n := R.wunify(f.Index, g.Index)
+		if n != nil {
+			return &substitution{}
+		}
+	}
+	return nil
+}
+
+func (i *worldindex) parent(s *worldsymbol) *worldsymbol {
+	for k, p := range i.Symbols {
+		if p == s {
+			if k < len(i.Symbols)+1 {
+				return i.Symbols[len(i.Symbols)+1]
+			}
+			return nil
+		}
+	}
+	return nil
+}
+
+func (i *worldindex) parentIndex(s *worldsymbol) []*worldsymbol {
+	for k, p := range i.Symbols {
+		if p == s {
+			return i.Symbols[k:]
+		}
+	}
+	return []*worldsymbol{}
+}
+
+func (i *worldindex) isGround() bool {
 	for _, s := range i.Symbols {
 		if !s.Ground {
 			return false
@@ -114,37 +181,57 @@ func (i *worldindex) ground() bool {
 	return true
 }
 
-func (i *worldindex) start() worldsymbol {
+func start(i *worldindex) *worldsymbol {
 	if len(i.Symbols) < 1 {
-		// TODO should we return an error here?
-		return worldsymbol{}
+		return nil
 	}
 	return i.Symbols[0]
 }
 
-func (i *worldindex) end() worldsymbol {
+func end(i *worldindex) *worldsymbol {
 	l := len(i.Symbols)
 	if l < 1 {
-		// TODO should we return an error here?
-		return worldsymbol{}
+		return nil
 	}
 	return i.Symbols[l-1]
 }
 
-func (i *worldindex) wunify(j *worldindex) *unification {
-	if i.start().Value == "0" && j.start().Value == "0" {
-		if i.end().Ground && j.end().Ground && i.end().Value == j.end().Value {
+func (s *substitution) applySubstitutionTo(fs []*formula) []*formula {
+	return fs
+}
+
+func (s *substitution) compose(u *unification) *unification {
+	return u
+}
+
+func (R *relation) findUnification(s0, s1 *worldsymbol) *unification {
+	return &unification{}
+}
+
+func (R *relation) wunify(i, j *worldindex) *unification {
+	if start(i).Value == "0" && start(j).Value == "0" {
+		if end(i).Ground && end(j).Ground && end(i).Value == end(j).Value {
 			return &unification{}
 		}
-		// TODO implement the rest
+		if end(i).Ground && !end(j).Ground && R.Serial {
+			o := R.findUnification(end(j), end(i))
+			if o != nil {
+				s := &substitution{Old: end(i), New: end(j)}
+				return s.compose(o)
+			}
+		}
+		if !end(i).Ground && !end(j).Ground && R.Serial {
+			o := R.findUnification(end(j), end(i))
+			if o != nil {
+				s := &substitution{Old: end(i), New: end(j)}
+				return s.compose(o)
+			}
+			o = R.findUnification(end(i), end(j))
+			if o != nil {
+				s := &substitution{Old: end(i), New: end(j)}
+				return s.compose(o)
+			}
+		}
 	}
 	return nil
-}
-
-func (f *formula) munify(g *formula) *substitution {
-	return nil
-}
-
-func (g *substitution) applySubstitutionTo(fs []*formula) []*formula {
-	return fs
 }
