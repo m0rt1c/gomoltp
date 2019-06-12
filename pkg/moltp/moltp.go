@@ -260,7 +260,8 @@ func reduceFormulas(f *formula) *formula {
 	switch f.Terminal {
 	case sDIAMOND:
 		// \Diamond A = \lnot \Box \lnot A
-		g0 := &formula{Terminal: sNOT, Operands: []*formula{f}}
+		A := f.Operands[0]
+		g0 := &formula{Terminal: sNOT, Operands: []*formula{A}}
 		g1 := &formula{Terminal: sBOX, Operands: []*formula{g0}}
 		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
 	default:
