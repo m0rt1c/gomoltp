@@ -21,7 +21,8 @@ func init() {
 func main() {
 	flag.Parse()
 	rf := &moltp.RawFormula{OID: 0, Formula: formula}
-	solution, err := moltp.Prove(rf, debugOn)
+	prover := moltp.Prover{Debug: debugOn}
+	solution, err := prover.Prove(rf)
 	if err != nil {
 		log.Println(err)
 	} else {

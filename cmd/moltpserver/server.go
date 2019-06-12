@@ -96,7 +96,8 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	solution, err := moltp.Prove(rf, debugOn)
+	prover := moltp.Prover{Debug: debugOn}
+	solution, err := prover.Prove(rf)
 	if err != nil {
 		log.Println("error solving", err)
 		w.WriteHeader(http.StatusInternalServerError)
