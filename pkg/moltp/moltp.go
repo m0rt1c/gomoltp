@@ -254,8 +254,8 @@ func tokenize(s string, term byte) ([]*token, error) {
 }
 
 func reduceFormulas(f *formula) *formula {
-	for _, g := range f.Operands {
-		reduceFormulas(g)
+	for i, g := range f.Operands {
+		f.Operands[i] = reduceFormulas(g)
 	}
 	switch f.Terminal {
 	case sDIAMOND:
