@@ -89,17 +89,17 @@ func (f *formula) String() string {
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("%s", f.Terminal)
 		}
-		return fmt.Sprintf("%s_{%s}", f.Terminal, f.Index)
+		return fmt.Sprintf("%s_{%s}", f.Terminal, &f.Index)
 	case 1:
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
 		}
-		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], f.Index)
+		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], &f.Index)
 	case 2:
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
 		}
-		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], f.Index)
+		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], &f.Index)
 	default:
 		k := ""
 		for _, o := range f.Operands {
@@ -112,7 +112,7 @@ func (f *formula) String() string {
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, k)
 		}
-		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, k, f.Index)
+		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, k, &f.Index)
 	}
 }
 
