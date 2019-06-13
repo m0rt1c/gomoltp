@@ -257,15 +257,18 @@ func (r r8) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		// TODO: Implement corret world index value
 		t.Index = f.Index
+		if start(&f.Index).Ground {
+			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: "W", Index: 0, Ground: false}}, f.Index.Symbols...)
+		} else {
+			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: "W", Index: start(&f.Index).Index + 1, Ground: false}}, f.Index.Symbols...)
+		}
 		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
 		b := []*formula{}
 		for _, p := range s.Left[:l-1] {
 			b = append(b, p)
 		}
 		n.Left = append(b, t)
-		fmt.Printf("R8 OK %s \n", n.Left)
 		n.Right = s.Right
 
 		return n, nil

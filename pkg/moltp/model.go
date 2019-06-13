@@ -89,7 +89,7 @@ func (f *formula) String() string {
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("%s", f.Terminal)
 		}
-		return fmt.Sprintf("%s_{%s}", f.Terminal, &f.Index)
+		return fmt.Sprintf("|%s|_{%s}", f.Terminal, &f.Index)
 	case 1:
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
@@ -131,7 +131,7 @@ func (i *worldindex) String() string {
 		return fmt.Sprintf("%s", i.Symbols[0])
 	default:
 		out := fmt.Sprintf("%s", i.Symbols[0])
-		for _, k := range i.Symbols {
+		for _, k := range i.Symbols[1:] {
 			out = fmt.Sprintf("%s:%s", out, k)
 		}
 		return out
