@@ -226,15 +226,14 @@ func (r r7) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		ns := &worldsymbol{}
-		ns.Ground = true
-		if t.Index.isGround() {
-			ns.Value = fmt.Sprintf("%d", len(t.Index.Symbols)+1)
+		ns := &worldsymbol{Ground: true}
+		if f.Index.isGround() {
+			ns.Value = fmt.Sprintf("%d", len(f.Index.Symbols))
 		} else {
 			// TODO: Implement corret world index value
-			ns.Value = fmt.Sprintf("f(w_%d)", len(t.Index.Symbols)+1)
+			ns.Value = fmt.Sprintf("f(W%d)", len(f.Index.Symbols))
 		}
-		t.Index.Symbols = append([]*worldsymbol{ns}, t.Index.Symbols...)
+		t.Index.Symbols = append([]*worldsymbol{ns}, f.Index.Symbols...)
 		n.Left = s.Left
 		n.Right = append([]*formula{t}, s.Right[1:]...)
 
@@ -257,7 +256,6 @@ func (r r8) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		t.Index = f.Index
 		if start(&f.Index).Ground {
 			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: "W", Index: 0, Ground: false}}, f.Index.Symbols...)
 		} else {

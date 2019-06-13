@@ -120,7 +120,7 @@ func (s *worldsymbol) String() string {
 	if s.Ground {
 		return s.Value
 	}
-	return fmt.Sprintf("%s_%d", s.Value, s.Index)
+	return fmt.Sprintf("%s%d", s.Value, s.Index)
 }
 
 func (i *worldindex) String() string {
