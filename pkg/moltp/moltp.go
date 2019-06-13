@@ -349,6 +349,9 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 	for len(unreduced) > 0 {
 		if p.Debug {
+			fmt.Println("******************************")
+			fmt.Println("**** Applying rules loop *****")
+			fmt.Println("******************************")
 			fmt.Println("Unreduced:")
 			for _, u := range unreduced {
 				fmt.Printf("\t%s\n", u)
@@ -361,8 +364,17 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 					fmt.Printf("\t%s\n", s)
 				}
 			}
+			if len(reduced) < 1 {
+				fmt.Println("Reduced list is empty")
+			} else {
+				fmt.Println("Reduced:")
+				for _, s := range reduced {
+					fmt.Printf("\t%s\n", s)
+				}
+			}
 		}
 
+		pushLastInSolution := false
 		last := unreduced[len(unreduced)-1]
 		new := []*Sequent{}
 
@@ -374,8 +386,9 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 			}
 			if s != nil {
 				if p.Debug {
-					fmt.Printf("Rule %s was applied\n", rule.getName())
+					fmt.Printf("Rule %s was applied on %s\n", rule.getName(), last)
 				}
+				pushLastInSolution = true
 				// The rule was applied successfully
 				i = i + 1
 				s.Name = fmt.Sprintf("S%d", i)
@@ -387,17 +400,72 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 					return solution, nil
 				}
 				new = append(new, s)
+				if p.Debug {
+					fmt.Printf("New sequent is %s\n", s)
+				}
 			}
 			// else the rule was not appliable
 		}
 
-		if len(last.Left) == 0 && len(last.Right) == 0 {
+		if pushLastInSolution {
+			solution = append(solution, last)
+		} else {
+			// If no rule was appliable to the last element
+			// we move it at the beginning of the reduced rules
 			reduced = append(reduced, last)
 		}
-
-		solution = append(solution, last)
 		unreduced = append(unreduced[:len(unreduced)-1], new...)
+
 	}
+
+	if p.Debug {
+		fmt.Println("******************************")
+		fmt.Println("**** Unreduced were over *****")
+		fmt.Println("******************************")
+		fmt.Println("Unreduced:")
+		for _, u := range unreduced {
+			fmt.Printf("\t%s\n", u)
+		}
+		if len(solution) < 1 {
+			fmt.Println("Solution is empty")
+		} else {
+			fmt.Println("Partial Solution:")
+			for _, s := range solution {
+				fmt.Printf("\t%s\n", s)
+			}
+		}
+		if len(reduced) < 1 {
+			fmt.Println("Reduced list is empty")
+		} else {
+			fmt.Println("Reduced:")
+			for _, s := range reduced {
+				fmt.Printf("\t%s\n", s)
+			}
+		}
+	}
+
+	if len(reduced) > 1 {
+		rule := p.ResolutionRule
+		s, err := rule.applyRuleTo(nil, &reduced)
+		if err != nil {
+			return solution, err
+		}
+		if s != nil {
+			if p.Debug {
+				fmt.Printf("Rule %s was applied on %s\n", rule.getName(), &reduced)
+			}
+			// The rule was applied successfully
+			i = i + 1
+			s.Name = fmt.Sprintf("S%d", i)
+
+			if len(s.Left) == 0 && len(s.Right) == 0 {
+				// A solution was found
+				solution = append(solution, s)
+				return solution, nil
+			}
+		}
+	}
+
 	return solution, fmt.Errorf("No solution found")
 }
 
