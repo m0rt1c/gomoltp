@@ -77,12 +77,12 @@ func (r r1) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 					if g != nil {
 						n := &Sequent{}
 
-						t1 := g.applySubstitutionTo(s1.Left[:l1-1])
-						t2 := g.applySubstitutionTo(s2.Left)
+						t1 := g.applyUnifications(s1.Left[:l1-1])
+						t2 := g.applyUnifications(s2.Left)
 						n.Left = append(t1, t2...)
 
-						t1 = g.applySubstitutionTo(s1.Right)
-						t2 = g.applySubstitutionTo(s2.Right[0:])
+						t1 = g.applyUnifications(s1.Right)
+						t2 = g.applyUnifications(s2.Right[0:])
 						n.Right = append(t1, t2...)
 
 						return n, nil

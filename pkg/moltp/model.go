@@ -46,7 +46,7 @@ type (
 	}
 
 	unification struct {
-		List []substitution
+		Map map[worldsymbol]worldsymbol
 	}
 
 	substitution struct {
@@ -138,17 +138,10 @@ func (i *worldindex) String() string {
 	}
 }
 
-func unify(f, g *formula) *unification {
-	return nil
-}
-
-func (R *relation) munify(f, g *formula) *substitution {
-	o := unify(f, g)
-	if o != nil {
-		n := R.wunify(&f.Index, &g.Index)
-		if n != nil {
-			return &substitution{}
-		}
+func (R *relation) munify(f, g *formula) *unification {
+	n := R.wunify(&f.Index, &g.Index)
+	if n != nil {
+		return n
 	}
 	return nil
 }
@@ -208,22 +201,30 @@ func (p *Prover) initRules() {
 	}
 }
 
-func (s *substitution) applySubstitutionTo(fs []*formula) []*formula {
+func (u *unification) applyUnifications(fs []*formula) []*formula {
+	newSymbols := []*worldsymbol{}
+	for _, f := range fs {
+		for _, s := range f.Index.Symbols {
+			newSymbols = append(newSymbols, &worldsymbol{Value: u.Map[*s].Value, Index: u.Map[*s].Index, Ground: u.Map[*s].Ground})
+		}
+	}
 	return fs
 }
 
 func (s *substitution) compose(u *unification) *unification {
+	u.Map[*s.Old] = *s.New
 	return u
 }
 
 func (R *relation) findUnification(s0, s1 *worldsymbol) *unification {
-	return &unification{}
+	u := &unification{Map: make(map[worldsymbol]worldsymbol)}
+	return u
 }
 
 func (R *relation) wunify(i, j *worldindex) *unification {
 	if start(i).Value == "0" && start(j).Value == "0" {
 		if end(i).Ground && end(j).Ground && end(i).Value == end(j).Value {
-			return &unification{}
+			return &unification{Map: make(map[worldsymbol]worldsymbol)}
 		}
 		if end(i).Ground && !end(j).Ground && R.Serial {
 			o := R.findUnification(end(j), end(i))
