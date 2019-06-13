@@ -452,16 +452,46 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 		}
 		if s != nil {
 			if p.Debug {
-				fmt.Printf("Rule %s was applied on %s\n", rule.getName(), &reduced)
+				fmt.Printf("Rule %s was applied on %s\n", rule.getName(), reduced)
 			}
 			// The rule was applied successfully
 			i = i + 1
 			s.Name = fmt.Sprintf("S%d", i)
 
+			if p.Debug {
+				fmt.Printf("New sequent is %s\n", s)
+			}
+
 			if len(s.Left) == 0 && len(s.Right) == 0 {
 				// A solution was found
 				solution = append(solution, s)
 				return solution, nil
+			}
+		}
+	}
+
+	if p.Debug {
+		fmt.Println("******************************")
+		fmt.Println("******* R1 was applied *******")
+		fmt.Println("******************************")
+		fmt.Println("Unreduced:")
+		for _, u := range unreduced {
+			fmt.Printf("\t%s\n", u)
+		}
+		if len(solution) < 1 {
+			fmt.Println("Solution is empty")
+		} else {
+			fmt.Println("Partial Solution:")
+			for _, s := range solution {
+				fmt.Printf("\t%s\n", s)
+			}
+		}
+		if len(reduced) < 1 {
+			fmt.Println("Reduced list is empty")
+		} else {
+			fmt.Println("Reduced:")
+			for _, s := range reduced {
+				fmt.Printf("\t%s\n", s)
 			}
 		}
 	}
