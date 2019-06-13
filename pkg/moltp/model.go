@@ -1,6 +1,9 @@
 package moltp
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type (
 	// RawFormula object holding a single unparsed formula encoded using a TEX notation
@@ -139,6 +142,16 @@ func (i *worldindex) String() string {
 	}
 }
 
+func (u *unification) String() string {
+	out := ""
+	if len(u.Map) > 0 {
+		for k, v := range u.Map {
+			out = fmt.Sprintf("%s/%s,", &k, &v)
+		}
+	}
+	return fmt.Sprintf("{%s}", strings.TrimSuffix(out, ","))
+}
+
 func (R *relation) munify(f, g *formula) *unification {
 	n := R.wunify(&f.Index, &g.Index)
 	if n != nil {
@@ -177,14 +190,14 @@ func (i *worldindex) isGround() bool {
 	return true
 }
 
-func start(i *worldindex) *worldsymbol {
+func end(i *worldindex) *worldsymbol {
 	if len(i.Symbols) < 1 {
 		return nil
 	}
 	return i.Symbols[0]
 }
 
-func end(i *worldindex) *worldsymbol {
+func start(i *worldindex) *worldsymbol {
 	l := len(i.Symbols)
 	if l < 1 {
 		return nil
@@ -230,7 +243,7 @@ func (R *relation) wunify(i, j *worldindex) *unification {
 		if end(i).Ground && end(j).Ground && end(i).Value == end(j).Value {
 			return &unification{Map: make(map[worldsymbol]worldsymbol)}
 		}
-		if end(i).Ground && !end(j).Ground && R.Serial {
+		if (end(i).Ground && !end(j).Ground || !end(i).Ground && end(j).Ground) && R.Serial {
 			o := R.findUnification(end(j), end(i))
 			if o != nil {
 				s := &substitution{Old: end(i), New: end(j)}
