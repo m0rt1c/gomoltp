@@ -368,7 +368,6 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 		// Try to apply each rule
 		for _, rule := range p.Rules {
-
 			s, err := rule.applyRuleTo(last, &unreduced)
 			if err != nil {
 				return solution, err
@@ -396,9 +395,8 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 			reduced = append(reduced, last)
 		}
 
-		unreduced = unreduced[:len(unreduced)-1]
-		unreduced = append(unreduced, new...)
 		solution = append(solution, last)
+		unreduced = append(unreduced[:len(unreduced)-1], new...)
 	}
 	return solution, fmt.Errorf("No solution found")
 }
