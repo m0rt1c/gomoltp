@@ -82,8 +82,10 @@ func (r r1) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 						n.Left = append(t1, t2...)
 
 						t1 = g.applyUnifications(s1.Right)
-						t2 = g.applyUnifications(s2.Right[0:])
+						t2 = g.applyUnifications(s2.Right[1:])
 						n.Right = append(t1, t2...)
+
+						n.Justification = []string{r.Name, s1.Name, s2.Name, fmt.Sprintf("%s", g)}
 
 						return n, nil
 					}
