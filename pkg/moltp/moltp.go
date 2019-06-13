@@ -420,7 +420,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 	if p.Debug {
 		fmt.Println("******************************")
-		fmt.Println("**** Unreduced were over *****")
+		fmt.Println("***** Unreduced are over *****")
 		fmt.Println("******************************")
 		fmt.Println("Unreduced:")
 		for _, u := range unreduced {
