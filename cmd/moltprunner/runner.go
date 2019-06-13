@@ -26,8 +26,9 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	} else {
+		fmt.Println("Solution found:")
 		for _, s := range solution {
-			fmt.Printf("%s\n", s)
+			fmt.Printf("\t%s\n", s)
 		}
 	}
 }
