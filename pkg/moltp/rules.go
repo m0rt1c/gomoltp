@@ -5,7 +5,9 @@ import "fmt"
 type (
 	inferenceRule interface {
 		getName() string
-		applyRuleTo(sequents *[]*Sequent) (*Sequent, error)
+		// s is the one we should apply the rule one
+		// the list of sequnets is for reference
+		applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error)
 	}
 	r1 struct {
 		Name string
@@ -56,7 +58,7 @@ type (
 
 // R1: If S,|p|_{i} <- T and S' <- |q|_{j}, T' and |p|_{i} and |q|_{j}
 // unify with unification O then S_{O} U S'_{O} <- T_{O} U T'_{O}
-func (r r1) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
+func (r r1) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	for _, s1 := range *sequents {
 		l1 := len(s1.Left)
 		if l1 < 1 {
@@ -96,8 +98,7 @@ func (r r1) getName() string {
 }
 
 // R2: If S,|(p->q)|_{i} <- T then S,|q|_{i}<-|p|_{i},T
-func (r r2) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r2) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Left)
 	if l < 1 {
 		return nil, nil
@@ -123,8 +124,7 @@ func (r r2) getName() string {
 }
 
 // R3: If S <- |(p->q)|_{i},T then S <- |q|_{i},T
-func (r r3) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r3) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Right)
 	if l < 1 {
 		return nil, nil
@@ -147,8 +147,7 @@ func (r r3) getName() string {
 }
 
 // R4: If S <- |(p->q)|_{i},T then S,|p|_{i} <- T
-func (r r4) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r4) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Right)
 	if l < 1 {
 		return nil, nil
@@ -171,8 +170,7 @@ func (r r4) getName() string {
 }
 
 // R5: If S,| not p|_{i} <- T then S <- |p|_{i},T
-func (r r5) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r5) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Left)
 	if l < 1 {
 		return nil, nil
@@ -195,8 +193,7 @@ func (r r5) getName() string {
 }
 
 // R6: If S <- |not p|_{i},T then S,|p|_{i} <- T
-func (r r6) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r6) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Right)
 	if l < 1 {
 		return nil, nil
@@ -219,8 +216,7 @@ func (r r6) getName() string {
 }
 
 // R7: If S <- | Box p|_{i},T then S <- |p|_{n:i},T
-func (r r7) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r7) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Right)
 	if l < 1 {
 		return nil, nil
@@ -251,8 +247,7 @@ func (r r7) getName() string {
 }
 
 // R8: If S,|Box p|_{i} <- T then S,|p|_{w:i} <- T
-func (r r8) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
-	s := (*sequents)[len(*sequents)-1]
+func (r r8) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	l := len(s.Left)
 	if l < 1 {
 		return nil, nil
@@ -275,14 +270,14 @@ func (r r8) getName() string {
 	return r.Name
 }
 
-func (r r9) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
+func (r r9) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	return nil, nil
 }
 func (r r9) getName() string {
 	return r.Name
 }
 
-func (r r10) applyRuleTo(sequents *[]*Sequent) (*Sequent, error) {
+func (r r10) applyRuleTo(s *Sequent, sequents *[]*Sequent) (*Sequent, error) {
 	return nil, nil
 }
 func (r r10) getName() string {

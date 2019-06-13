@@ -342,8 +342,11 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 	i := 1
 	solution := []*Sequent{}
 	unreduced := []*Sequent{}
+	reduced := []*Sequent{}
+
 	f.Index = worldindex{[]*worldsymbol{&worldsymbol{Ground: true, Value: "0"}}}
 	unreduced = append(unreduced, &Sequent{Right: []*formula{f}, Name: "S1"})
+
 	for len(unreduced) > 0 {
 		if p.Debug {
 			fmt.Println("Unreduced:")
@@ -361,10 +364,12 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 		}
 
 		last := unreduced[len(unreduced)-1]
-		unreduced = unreduced[:len(unreduced)-1]
+		new := []*Sequent{}
+
 		// Try to apply each rule
 		for _, rule := range p.Rules {
-			s, err := rule.applyRuleTo(&unreduced)
+
+			s, err := rule.applyRuleTo(last, &unreduced)
 			if err != nil {
 				return solution, err
 			}
@@ -382,14 +387,20 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 					solution = append(solution, s)
 					return solution, nil
 				}
-				unreduced = append(unreduced, s)
+				new = append(new, s)
 			}
 			// else the rule was not appliable
 		}
 
+		if len(last.Left) == 0 && len(last.Right) == 0 {
+			reduced = append(reduced, last)
+		}
+
+		unreduced = unreduced[:len(unreduced)-1]
+		unreduced = append(unreduced, new...)
 		solution = append(solution, last)
 	}
-	return solution, nil
+	return solution, fmt.Errorf("No solution found")
 }
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
