@@ -219,15 +219,15 @@ func (p *Prover) initRules() {
 	if len(p.Rules) == 0 {
 		// TODO make this look better
 		p.Rules = []inferenceRule{
-			r2{Name: "R2", R: p.R},
-			r3{Name: "R3", R: p.R},
-			r4{Name: "R4", R: p.R},
-			r5{Name: "R5", R: p.R},
-			r6{Name: "R6", R: p.R},
-			r7{Name: "R7", R: p.R, WorldKeeper: p.worldKeeper},
-			r8{Name: "R8", R: p.R, WorldKeeper: p.worldKeeper},
-			r9{Name: "R9", R: p.R},
-			r10{Name: "R10", R: p.R},
+			r2{Name: "R2"},
+			r3{Name: "R3"},
+			r4{Name: "R4"},
+			r5{Name: "R5"},
+			r6{Name: "R6"},
+			r7{Name: "R7", WorldKeeper: p.worldKeeper},
+			r8{Name: "R8", WorldKeeper: p.worldKeeper},
+			r9{Name: "R9"},
+			r10{Name: "R10"},
 		}
 	}
 	if p.ResolutionRule == nil {

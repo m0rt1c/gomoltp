@@ -17,19 +17,15 @@ type (
 	}
 	r2 struct {
 		Name string
-		R    *relation
 	}
 	r3 struct {
 		Name string
-		R    *relation
 	}
 	r4 struct {
 		Name string
-		R    *relation
 	}
 	r5 struct {
 		Name string
-		R    *relation
 	}
 	r6 struct {
 		Name string
@@ -37,21 +33,17 @@ type (
 	}
 	r7 struct {
 		Name        string
-		R           *relation
 		WorldKeeper *worldkeeper
 	}
 	r8 struct {
 		Name        string
-		R           *relation
 		WorldKeeper *worldkeeper
 	}
 	r9 struct {
 		Name string
-		R    *relation
 	}
 	r10 struct {
 		Name string
-		R    *relation
 	}
 )
 
