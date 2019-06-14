@@ -25,6 +25,7 @@ type (
 		Rules          []inferenceRule
 		ResolutionRule resolutionRule
 		R              *relation
+		worldKeeper    *worldkeeper
 	}
 
 	// Sequent object holding a Sequent
@@ -70,6 +71,11 @@ type (
 
 	worldindex struct {
 		Symbols []*worldsymbol
+	}
+
+	worldkeeper struct {
+		NextIndex int
+		NextVar   string
 	}
 
 	formula struct {
@@ -209,9 +215,20 @@ func (p *Prover) initRules() {
 	if p.R == nil {
 		p.R = &relation{Serial: true}
 	}
+	p.worldKeeper = &worldkeeper{NextVar: "W", NextIndex: 0}
 	if len(p.Rules) == 0 {
 		// TODO make this look better
-		p.Rules = []inferenceRule{r2{Name: "R2", R: p.R}, r3{Name: "R3", R: p.R}, r4{Name: "R4", R: p.R}, r5{Name: "R5", R: p.R}, r6{Name: "R6", R: p.R}, r7{Name: "R7", R: p.R}, r8{Name: "R8", R: p.R}, r9{Name: "R9", R: p.R}, r10{Name: "R10", R: p.R}}
+		p.Rules = []inferenceRule{
+			r2{Name: "R2", R: p.R},
+			r3{Name: "R3", R: p.R},
+			r4{Name: "R4", R: p.R},
+			r5{Name: "R5", R: p.R},
+			r6{Name: "R6", R: p.R},
+			r7{Name: "R7", R: p.R, WorldKeeper: p.worldKeeper},
+			r8{Name: "R8", R: p.R, WorldKeeper: p.worldKeeper},
+			r9{Name: "R9", R: p.R},
+			r10{Name: "R10", R: p.R},
+		}
 	}
 	if p.ResolutionRule == nil {
 		p.ResolutionRule = r1{Name: "R1", R: p.R}
