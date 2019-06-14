@@ -283,4 +283,13 @@ func (R *relation) wunify(i, j *worldindex) *unification {
 	return nil
 }
 
-func (k *worldkeeper) updateNextVariable() {}
+func (k *worldkeeper) updateNextVariable() {
+	switch k.NextVar {
+	case "w":
+		k.NextVar = "v"
+	case "v":
+		k.NextVar = "t"
+	default:
+		k.NextVar = fmt.Sprintf("%s'", k.NextVar)
+	}
+}
