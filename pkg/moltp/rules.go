@@ -260,7 +260,7 @@ func (r r8) applyRuleTo(s *Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		if start(&f.Index).Ground {
+		if f.Index.isGround() {
 			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: "W", Index: 0, Ground: false}}, f.Index.Symbols...)
 		} else {
 			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: "W", Index: start(&f.Index).Index + 1, Ground: false}}, f.Index.Symbols...)
