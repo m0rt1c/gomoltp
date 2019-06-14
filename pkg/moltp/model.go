@@ -25,7 +25,7 @@ type (
 		Rules          []inferenceRule
 		ResolutionRule resolutionRule
 		R              *relation
-		worldKeeper    *worldkeeper
+		worldsKeeper    *worldskeeper
 	}
 
 	// Sequent object holding a Sequent
@@ -73,7 +73,7 @@ type (
 		Symbols []*worldsymbol
 	}
 
-	worldkeeper struct {
+	worldskeeper struct {
 		NextIndex int
 		NextVar   string
 	}
@@ -215,7 +215,7 @@ func (p *Prover) initRules() {
 	if p.R == nil {
 		p.R = &relation{Serial: true}
 	}
-	p.worldKeeper = &worldkeeper{NextVar: "W", NextIndex: 0}
+	p.worldsKeeper = &worldskeeper{NextVar: "W", NextIndex: 0}
 	if len(p.Rules) == 0 {
 		// TODO make this look better
 		p.Rules = []inferenceRule{
@@ -224,8 +224,8 @@ func (p *Prover) initRules() {
 			r4{Name: "R4"},
 			r5{Name: "R5"},
 			r6{Name: "R6"},
-			r7{Name: "R7", WorldKeeper: p.worldKeeper},
-			r8{Name: "R8", WorldKeeper: p.worldKeeper},
+			r7{Name: "R7", worldsKeeper: p.worldsKeeper},
+			r8{Name: "R8", worldsKeeper: p.worldsKeeper},
 			r9{Name: "R9"},
 			r10{Name: "R10"},
 		}
@@ -283,7 +283,7 @@ func (R *relation) wunify(i, j *worldindex) *unification {
 	return nil
 }
 
-func (k *worldkeeper) updateNextVariable() {
+func (k *worldskeeper) updateNextVariable() {
 	switch k.NextVar {
 	case "w":
 		k.NextVar = "v"
