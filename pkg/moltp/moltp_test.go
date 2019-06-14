@@ -47,6 +47,8 @@ func TestProver(t *testing.T) {
 			"S3: |( Box a )|_{0} <-  [R4 S1]",
 			"S2:  <- |( Box ( Box a ) )|_{0} [R3 S1]",
 			"S5:  <- |( Box a )|_{1:0} [R7 S2]",
+			"S4: |a|_{W0:0} <-  [R8 S3]",
+			"S6:  <- |a|_{2:1:0} [R7 S5]",
 			"S7:  <-  [R1 S4 S6 {W0/2}]",
 		}
 		for i, o := range out {
