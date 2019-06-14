@@ -282,3 +282,5 @@ func (R *relation) wunify(i, j *worldindex) *unification {
 	}
 	return nil
 }
+
+func (k *worldkeeper) updateNextVariable() {}

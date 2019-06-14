@@ -229,7 +229,8 @@ func (r r7) applyRuleTo(s *Sequent) (*Sequent, error) {
 			ns.Value = fmt.Sprintf("%d", r.WorldKeeper.NextIndex)
 		} else {
 			// TODO: Implement corret world index value
-			ns.Value = fmt.Sprintf("f(%s%d)", r.WorldKeeper.NextVar, r.WorldKeeper.NextIndex)
+			ns.Value = fmt.Sprintf("f(%s)", r.WorldKeeper.NextVar)
+			r.WorldKeeper.updateNextVariable()
 			// r.WorldKeeper.NextVar
 		}
 		r.WorldKeeper.NextIndex = r.WorldKeeper.NextIndex + 1
@@ -261,6 +262,7 @@ func (r r8) applyRuleTo(s *Sequent) (*Sequent, error) {
 		} else {
 			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: "W", Index: start(&f.Index).Index + 1, Ground: false}}, f.Index.Symbols...)
 		}
+		r.WorldKeeper.updateNextVariable()
 		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
 		b := []*formula{}
 		for _, p := range s.Left[:l-1] {
