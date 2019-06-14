@@ -36,12 +36,14 @@ type (
 		R    *relation
 	}
 	r7 struct {
-		Name string
-		R    *relation
+		Name        string
+		R           *relation
+		WorldKeeper *worldkeeper
 	}
 	r8 struct {
-		Name string
-		R    *relation
+		Name        string
+		R           *relation
+		WorldKeeper *worldkeeper
 	}
 	r9 struct {
 		Name string
@@ -232,11 +234,13 @@ func (r r7) applyRuleTo(s *Sequent) (*Sequent, error) {
 		t := copyTopFormulaLevel(f.Operands[0])
 		ns := &worldsymbol{Ground: true}
 		if f.Index.isGround() {
-			ns.Value = fmt.Sprintf("%d", len(f.Index.Symbols))
+			ns.Value = fmt.Sprintf("%d", r.WorldKeeper.NextIndex)
 		} else {
 			// TODO: Implement corret world index value
-			ns.Value = fmt.Sprintf("f(W%d)", len(f.Index.Symbols))
+			ns.Value = fmt.Sprintf("f(%s%d)", r.WorldKeeper.NextVar, r.WorldKeeper.NextIndex)
+			// r.WorldKeeper.NextVar
 		}
+		r.WorldKeeper.NextIndex = r.WorldKeeper.NextIndex + 1
 		t.Index.Symbols = append([]*worldsymbol{ns}, f.Index.Symbols...)
 		n.Left = s.Left
 		n.Right = append([]*formula{t}, s.Right[1:]...)
