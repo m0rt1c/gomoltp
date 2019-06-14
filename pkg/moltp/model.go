@@ -23,7 +23,7 @@ type (
 	Prover struct {
 		Debug          bool
 		Rules          []inferenceRule
-		ResolutionRule inferenceRule
+		ResolutionRule resolutionRule
 		R              *relation
 	}
 
