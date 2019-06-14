@@ -37,7 +37,7 @@ func TestReduceANDFormula(t *testing.T) {
 
 func TestProver1(t *testing.T) {
 	rf := &RawFormula{OID: 0, Formula: "\\Box a \\to \\Box \\Box a"}
-	prover := Prover{Debug: true}
+	prover := Prover{Debug: false}
 	solution, err := prover.Prove(rf)
 	if err != nil {
 		t.Errorf("got error %s want nil", err)
@@ -63,7 +63,7 @@ func TestProver1(t *testing.T) {
 
 func TestProver2(t *testing.T) {
 	rf := &RawFormula{OID: 0, Formula: "\\Box \\Box a \\to \\Diamond \\Diamond a"}
-	prover := Prover{Debug: true}
+	prover := Prover{Debug: false}
 	solution, err := prover.Prove(rf)
 	if err != nil {
 		t.Errorf("got error %s want nil", err)
