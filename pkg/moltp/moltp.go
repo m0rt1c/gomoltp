@@ -380,7 +380,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 		// Try to apply each rule
 		for _, rule := range p.Rules {
-			s, err := rule.applyRuleTo(last, &unreduced)
+			s, err := rule.applyRuleTo(last)
 			if err != nil {
 				return solution, err
 			}
@@ -446,14 +446,15 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 	if len(reduced) > 1 {
 		rule := p.ResolutionRule
-		s, err := rule.applyRuleTo(nil, &reduced)
+		res, err := rule.applyRuleTo(&reduced)
 		if err != nil {
 			return solution, err
 		}
-		if s != nil {
+		if len(res) > 0 {
 			if p.Debug {
 				fmt.Printf("Rule %s was applied on %s\n", rule.getName(), reduced)
 			}
+			s := res[2]
 			// The rule was applied successfully
 			i = i + 1
 			s.Name = fmt.Sprintf("S%d", i)
@@ -464,7 +465,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 			if len(s.Left) == 0 && len(s.Right) == 0 {
 				// A solution was found
-				solution = append(solution, s)
+				solution = append(solution, res...)
 				return solution, nil
 			}
 		}
