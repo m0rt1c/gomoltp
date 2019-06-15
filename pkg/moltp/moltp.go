@@ -295,6 +295,34 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 	var formulas []*formula
 	for _, t := range tokens {
 		if t.IsOp {
+			if t.MuOp {
+				// We must have (1) a formula and a (2) list of variables name
+				// Something like forall x \Box x -> x
+				if len(formulas) < 2 {
+					return formulas[0], fmt.Errorf("missing arguments for multi operator %s", t.Value)
+				}
+				f := &formula{}
+				f.Terminal = t.Value
+				// (1) This should find the formula
+				m := formulas[len(formulas)-1]
+				formulas = formulas[:len(formulas)-1]
+				f.Operands = append(f.Operands, formulas[len(formulas)-1])
+				formulas = formulas[:len(formulas)-1]
+				// (2) this should find all the variables, mind that they are in the reversed order
+				for k := len(formulas) - 1; k >= 0; k-- {
+					if formulas[k].Terminal == "," {
+						if k-1 < 0 {
+							return formulas[0], fmt.Errorf("missing argument for multi operator %s", t.Value)
+						}
+						f.Operands = append([]*formula{formulas[k-1]}, f.Operands...)
+					} else {
+						formulas = formulas[:k]
+						break
+					}
+				}
+				f.Operands = append(f.Operands, m)
+				formulas = append(formulas, f)
+			}
 			if t.BiOp {
 				if len(formulas) < 2 {
 					return formulas[0], fmt.Errorf("missing argument for binary operator %s", t.Value)
