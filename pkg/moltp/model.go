@@ -236,8 +236,8 @@ func (p *Prover) initRules() {
 			r6{Name: "R6"},
 			r7{Name: "R7", worldsKeeper: p.worldsKeeper},
 			r8{Name: "R8", worldsKeeper: p.worldsKeeper},
-			r9{Name: "R9"},
-			r10{Name: "R10"},
+			r9{Name: "R9", worldsKeeper: p.worldsKeeper},
+			r10{Name: "R10", worldsKeeper: p.worldsKeeper},
 		}
 	}
 	if p.ResolutionRule == nil {

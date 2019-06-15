@@ -40,10 +40,12 @@ type (
 		worldsKeeper *worldskeeper
 	}
 	r9 struct {
-		Name string
+		Name         string
+		worldsKeeper *worldskeeper
 	}
 	r10 struct {
-		Name string
+		Name         string
+		worldsKeeper *worldskeeper
 	}
 )
 
