@@ -289,6 +289,38 @@ func (r r9) getName() string {
 }
 
 func (r r10) applyRuleTo(s *Sequent) (*Sequent, error) {
+	l := len(s.Left)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Left[l-1]
+	if f.Terminal == sFORALL {
+		n := &Sequent{}
+
+		t := copyTopFormulaLevel(f.Operands[len(f.Operands)-1])
+		g := &unification{}
+
+		for _, v := range f.Operands[:len(f.Operands)-1] {
+			ws := worldsymbol{
+				Value:  v.Terminal,
+				Ground: false,
+			}
+			g.Map[ws] = worldsymbol{Value: r.worldsKeeper.NextVar, Ground: false}
+			r.worldsKeeper.updateNextVariable()
+		}
+
+		g.applyUnification(f)
+
+		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
+		b := []*formula{}
+		for _, p := range s.Left[:l-1] {
+			b = append(b, p)
+		}
+		n.Left = append(b, t)
+		n.Right = s.Right
+
+		return n, nil
+	}
 	return nil, nil
 }
 func (r r10) getName() string {
