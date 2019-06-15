@@ -106,19 +106,29 @@ func (f *formula) String() string {
 		}
 		return fmt.Sprintf("|( %s %s )|_{%s}", f.Terminal, f.Operands[0], &f.Index)
 	case 2:
-		if len(f.Index.Symbols) < 1 {
-			return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
+		// Workaround when multioperators have 2 arguments
+		// TODO: Find a better way to handle this case
+		if f.Terminal != sFORALL && f.Terminal != sEXISTS {
+			if len(f.Index.Symbols) < 1 {
+				return fmt.Sprintf("( %s %s %s )", f.Operands[0], f.Terminal, f.Operands[1])
+			}
+			return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], &f.Index)
 		}
-		return fmt.Sprintf("|( %s %s %s )|_{%s}", f.Operands[0], f.Terminal, f.Operands[1], &f.Index)
+		// going to default
+		fallthrough
 	default:
+		// In multi operator formulas ( forall ) the first n elements are variables name
+		// the last one a formula
 		k := ""
-		for _, o := range f.Operands {
+		for _, o := range f.Operands[:len(f.Operands)-1] {
 			if k == "" {
 				k = fmt.Sprintf("%s", o)
 			} else {
 				k = fmt.Sprintf("%s, %s", k, o)
 			}
 		}
+		k = fmt.Sprintf("( %s ) %s", k, f.Operands[len(f.Operands)-1])
+
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, k)
 		}
