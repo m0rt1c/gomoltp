@@ -74,13 +74,13 @@ func TestProver2(t *testing.T) {
 			"S4: |( Box a )|_{W0:0} <-  [R8 S3]",
 			"S2:  <- |( Not ( Box ( Not ( Not ( Box ( Not a ) ) ) ) ) )|_{0} [R3 S1]",
 			"S6: |( Box ( Not ( Not ( Box ( Not a ) ) ) ) )|_{0} <-  [R6 S2]",
-			"S7: |( Box ( Not a ) )|_{W0:0} <-  [R8 S6]",
-			"S8:  <- |( Not ( Box ( Not a ) ) )|_{W0:0} [R5 S7]",
-			"S9: |( Box ( Not a ) )|_{W0:0} <-  [R6 S8]",
-			"S10: |( Not a )|_{W1:W0:0} <-  [R8 S9]",
-			"S5: |a|_{W1:W0:0} <-  [R8 S4]",
-			"S11:  <- |a|_{W1:W0:0} [R5 S10]",
-			"S12:  <-  [R1 S5 S11 {W1/W1}]",
+			"S7: |( Box ( Not a ) )|_{V0:0} <-  [R8 S6]",
+			"S8:  <- |( Not ( Box ( Not a ) ) )|_{V0:0} [R5 S7]",
+			"S9: |( Box ( Not a ) )|_{V0:0} <-  [R6 S8]",
+			"S10: |( Not a )|_{V1:V0:0} <-  [R8 S9]",
+			"S5: |a|_{V1:V0:0} <-  [R8 S4]",
+			"S11:  <- |a|_{V1:V0:0} [R5 S10]",
+			"S12:  <-  [R1 S5 S11 {W1/V1}]",
 		}
 		for i, o := range out {
 			s := fmt.Sprintf("%s", solution[i])
