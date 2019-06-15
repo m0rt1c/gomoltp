@@ -311,7 +311,7 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 				}
 				f := &formula{}
 				f.Terminal = t.Value
-				f.Operands = append(f.Operands, formulas[len(formulas)-1:]...)
+				f.Operands = append(f.Operands, formulas[len(formulas)-1])
 				formulas = formulas[:len(formulas)-1]
 				formulas = append(formulas, f)
 			}
