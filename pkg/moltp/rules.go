@@ -282,6 +282,51 @@ func (r r8) getName() string {
 }
 
 func (r r9) applyRuleTo(s *Sequent) (*Sequent, error) {
+	l := len(s.Right)
+	if l < 1 {
+		return nil, nil
+	}
+	f := s.Right[0]
+	if f.Terminal == sFORALL {
+		n := &Sequent{}
+
+		n.Left = s.Left
+
+		t := copyTopFormulaLevel(f.Operands[len(f.Operands)-1])
+		t.Index = f.Index
+
+		g := &unification{}
+		// TODO: Implement correct variable substitution
+		if t.Index.isGround() {
+			for _, v := range f.Operands[:len(f.Operands)-1] {
+				ws := worldsymbol{
+					Value:  v.Terminal,
+					Ground: false,
+				}
+				g.Map[ws] = worldsymbol{Value: fmt.Sprintf("%d", r.worldsKeeper.NextIndex), Ground: true}
+				r.worldsKeeper.NextIndex = r.worldsKeeper.NextIndex + 1
+			}
+		} else {
+			for _, v := range f.Operands[:len(f.Operands)-1] {
+				ws := worldsymbol{
+					Value:  v.Terminal,
+					Ground: false,
+				}
+				g.Map[ws] = worldsymbol{Value: fmt.Sprintf("f(%s)", r.worldsKeeper.NextVar), Ground: true}
+				r.worldsKeeper.updateNextVariable()
+			}
+		}
+		g.applyUnification(f)
+
+		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
+		b := []*formula{}
+		for _, p := range s.Left[:l-1] {
+			b = append(b, p)
+		}
+		n.Left = append(b, t)
+
+		return n, nil
+	}
 	return nil, nil
 }
 func (r r9) getName() string {
