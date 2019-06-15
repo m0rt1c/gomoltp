@@ -373,7 +373,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 	reduced := []*Sequent{}
 
 	f.Index = worldindex{[]*worldsymbol{&worldsymbol{Ground: true, Value: "0"}}}
-	p.worldsKeeper.NextIndex = p.worldsKeeper.NextIndex + 1
+	p.worldsKeeper.NextConst = p.worldsKeeper.NextConst + 1
 
 	unreduced = append(unreduced, &Sequent{Right: []*formula{f}, Name: "S1"})
 

@@ -228,14 +228,14 @@ func (r r7) applyRuleTo(s *Sequent) (*Sequent, error) {
 		t := copyTopFormulaLevel(f.Operands[0])
 		ns := &worldsymbol{Ground: true}
 		if f.Index.isGround() {
-			ns.Value = fmt.Sprintf("%d", r.worldsKeeper.NextIndex)
+			ns.Value = fmt.Sprintf("%d", r.worldsKeeper.NextConst)
 		} else {
 			// TODO: Implement corret world index value
 			ns.Value = fmt.Sprintf("f(%s)", r.worldsKeeper.NextVar)
 			r.worldsKeeper.updateNextVariable()
 			// r.worldsKeeper.NextVar
 		}
-		r.worldsKeeper.NextIndex = r.worldsKeeper.NextIndex + 1
+		r.worldsKeeper.NextConst = r.worldsKeeper.NextConst + 1
 		t.Index.Symbols = append([]*worldsymbol{ns}, f.Index.Symbols...)
 		n.Left = s.Left
 		n.Right = append([]*formula{t}, s.Right[1:]...)
@@ -303,8 +303,8 @@ func (r r9) applyRuleTo(s *Sequent) (*Sequent, error) {
 					Value:  v.Terminal,
 					Ground: false,
 				}
-				g.Map[ws] = worldsymbol{Value: fmt.Sprintf("%d", r.worldsKeeper.NextIndex), Ground: true}
-				r.worldsKeeper.NextIndex = r.worldsKeeper.NextIndex + 1
+				g.Map[ws] = worldsymbol{Value: fmt.Sprintf("%d", r.worldsKeeper.NextConst), Ground: true}
+				r.worldsKeeper.NextConst = r.worldsKeeper.NextConst + 1
 			}
 		} else {
 			for _, v := range f.Operands[:len(f.Operands)-1] {

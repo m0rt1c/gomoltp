@@ -74,7 +74,7 @@ type (
 	}
 
 	worldskeeper struct {
-		NextIndex int
+		NextConst int
 		NextVar   string
 	}
 
@@ -225,7 +225,7 @@ func (p *Prover) initRules() {
 	if p.R == nil {
 		p.R = &relation{Serial: true}
 	}
-	p.worldsKeeper = &worldskeeper{NextVar: "W", NextIndex: 0}
+	p.worldsKeeper = &worldskeeper{NextVar: "W", NextConst: 0}
 	if len(p.Rules) == 0 {
 		// TODO make this look better
 		p.Rules = []inferenceRule{
