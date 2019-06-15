@@ -261,7 +261,7 @@ func (r r8) applyRuleTo(s *Sequent) (*Sequent, error) {
 			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: r.worldsKeeper.NextVar, Index: 0, Ground: false}}, f.Index.Symbols...)
 			r.worldsKeeper.updateNextVariable()
 		} else {
-			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: start(&f.Index).Value, Index: start(&f.Index).Index + 1, Ground: false}}, f.Index.Symbols...)
+			t.Index.Symbols = append([]*worldsymbol{&worldsymbol{Value: end(&f.Index).Value, Index: end(&f.Index).Index + 1, Ground: false}}, f.Index.Symbols...)
 		}
 		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
 		b := []*formula{}
