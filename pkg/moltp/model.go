@@ -245,12 +245,17 @@ func (p *Prover) initRules() {
 	}
 }
 
-func (u *unification) applyUnifications(fs []*formula) []*formula {
+func (u *unification) applyUnification(f *formula) *formula {
 	newSymbols := []*worldsymbol{}
+	for _, s := range f.Index.Symbols {
+		newSymbols = append(newSymbols, &worldsymbol{Value: u.Map[*s].Value, Index: u.Map[*s].Index, Ground: u.Map[*s].Ground})
+	}
+	return f
+}
+
+func (u *unification) applyUnifications(fs []*formula) []*formula {
 	for _, f := range fs {
-		for _, s := range f.Index.Symbols {
-			newSymbols = append(newSymbols, &worldsymbol{Value: u.Map[*s].Value, Index: u.Map[*s].Index, Ground: u.Map[*s].Ground})
-		}
+		u.applyUnification(f)
 	}
 	return fs
 }
