@@ -298,6 +298,7 @@ func (r r10) applyRuleTo(s *Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[len(f.Operands)-1])
+		t.Index = f.Index
 		g := &unification{}
 
 		for _, v := range f.Operands[:len(f.Operands)-1] {
