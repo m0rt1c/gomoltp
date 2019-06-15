@@ -25,7 +25,7 @@ type (
 		Rules          []inferenceRule
 		ResolutionRule resolutionRule
 		R              *relation
-		worldsKeeper    *worldskeeper
+		worldsKeeper   *worldskeeper
 	}
 
 	// Sequent object holding a Sequent
