@@ -57,7 +57,7 @@ function prove(){
   .then(function(response) {
     if (response.status != 200) {
       response.json().then(function(data){
-        alert("Info: "+String(data["info"]))
+        alert(String(`${data["info"])}`)
         if (response.status == 500) {
           if (data != null && data != "null")  {
             document.querySelector('#soltitle').innerText = "Partial result"
