@@ -360,8 +360,17 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 func encodeSequent(s *Sequent) (RawSequent, error) {
 	rs := RawSequent{}
 
+	rs.Name = s.Name
 	rs.Left = toTextRepr(formulaArrayToString(s.Left))
 	rs.Right = toTextRepr(formulaArrayToString(s.Right))
+	rs.Justification = ""
+	for _, j := range s.Justification {
+		if rs.Justification == "" {
+			rs.Justification = fmt.Sprintf("%s", j)
+		} else {
+			rs.Justification = fmt.Sprintf("%s, %s", rs.Justification, j)
+		}
+	}
 
 	return rs, nil
 }
