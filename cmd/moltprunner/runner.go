@@ -25,10 +25,11 @@ func main() {
 	solution, err := prover.Prove(rf)
 	if err != nil {
 		log.Println(err)
+		fmt.Println("Partial result:")
 	} else {
 		fmt.Println("Solution found:")
-		for _, s := range solution {
-			fmt.Printf("\t%s\n", s)
-		}
+	}
+	for _, s := range solution {
+		fmt.Printf("\t%s\n", s)
 	}
 }
