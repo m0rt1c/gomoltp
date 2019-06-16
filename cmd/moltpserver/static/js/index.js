@@ -1,3 +1,5 @@
+solution = document.querySelector('#solution')
+
 function render(formula, renderer){
   let input = document.querySelector(String(`#${formula}`))
   let where = document.querySelector(String(`#${renderer}`))
@@ -9,6 +11,7 @@ function render(formula, renderer){
 
 function prove(){
   var data = {'oid':0, 'formula':document.querySelector("#f1").value}
+  solution.innerHTML = ''
 
   return fetch("/prover", {
     method: "POST",
@@ -24,8 +27,6 @@ function prove(){
       })
     } else {
       response.json().then(function(data){
-        a = document.querySelector('#solution')
-        a.innerHTML = ''
         if (data == null || data == "null")  {
           alert("Empty reponse!")
         } else {
@@ -33,7 +34,7 @@ function prove(){
           var s = data[k]
           while( s != undefined ){
             li = document.createElement('li')
-            a.appendChild(li)
+            solution.appendChild(li)
             d1 = document.createElement('div')
             d1.classList.add("sequntsegment")
             d2 = document.createElement('div')
