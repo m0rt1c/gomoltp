@@ -571,7 +571,7 @@ func (p *Prover) Prove(rf *RawFormula) ([]*Sequent, error) {
 		}
 	}
 	if err != nil {
-		return nil, err
+		return s, err
 	}
 	return s, nil
 }
