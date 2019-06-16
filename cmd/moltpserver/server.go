@@ -79,6 +79,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func proofHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("********* Incoming request **********")
+	log.Println(r)
+	log.Println("*************************************")
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -87,6 +92,10 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(infomessage{Info: "Bad body"})
 		return
 	}
+
+	log.Println("************** Body is **************")
+	log.Printf("%s\n", body)
+	log.Println("*************************************")
 
 	rf := &moltp.RawFormula{}
 	err = json.Unmarshal(body, rf)
@@ -126,6 +135,10 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(infomessage{Info: fmt.Sprintf("error json encoding: %s", err)})
 		return
 	}
+
+	log.Println("************ Solution is ************")
+	log.Println(rawSolution)
+	log.Println("*************************************")
 }
 
 func main() {
