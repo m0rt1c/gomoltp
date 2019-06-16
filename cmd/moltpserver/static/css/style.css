@@ -9,13 +9,14 @@
 }
 
 .sequntsegment {
-  width: 23%;
+  width: 40%;
   display: inline-block;
 }
 
 .sequntdivider {
-  width: 2%;
+  width: 6%;
   display: inline-block;
+  text-align: center;
 }
 
 #f1 {
