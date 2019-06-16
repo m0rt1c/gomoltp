@@ -295,7 +295,7 @@ func (r r9) applyRuleTo(s *Sequent) (*Sequent, error) {
 		t := copyTopFormulaLevel(f.Operands[len(f.Operands)-1])
 		t.Index = f.Index
 
-		g := &unification{}
+		g := &unification{Map: make(map[worldsymbol]worldsymbol)}
 		// TODO: Implement correct variable substitution
 		if t.Index.isGround() {
 			for _, v := range f.Operands[:len(f.Operands)-1] {
@@ -344,7 +344,7 @@ func (r r10) applyRuleTo(s *Sequent) (*Sequent, error) {
 
 		t := copyTopFormulaLevel(f.Operands[len(f.Operands)-1])
 		t.Index = f.Index
-		g := &unification{}
+		g := &unification{Map: make(map[worldsymbol]worldsymbol)}
 
 		for _, v := range f.Operands[:len(f.Operands)-1] {
 			ws := worldsymbol{
