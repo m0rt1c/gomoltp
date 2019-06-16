@@ -316,7 +316,7 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 						}
 						f.Operands = append([]*formula{formulas[k-1]}, f.Operands...)
 					} else {
-						formulas = formulas[:k]
+						formulas = formulas[:k+1]
 						break
 					}
 				}
