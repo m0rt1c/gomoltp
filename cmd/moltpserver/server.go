@@ -21,7 +21,8 @@ type (
 	}
 
 	infomessage struct {
-		Info string `json:"info"`
+		Info          string                    `json:"info"`
+		PartialResult *map[int]moltp.RawSequent `json:"result"`
 	}
 )
 
@@ -101,7 +102,12 @@ func proofHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("error solving", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(infomessage{Info: fmt.Sprintf("error solving: %s", err)})
+		info := infomessage{Info: fmt.Sprintf("error solving: %s", err)}
+		rawSolution, err := moltp.EncodeSequentSlice(solution)
+		if err == nil {
+			info.PartialResult = rawSolution
+		}
+		json.NewEncoder(w).Encode(info)
 		return
 	}
 
