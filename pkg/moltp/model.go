@@ -15,8 +15,10 @@ type (
 	// RawSequent object holding a single unparsed Sequent
 	// Left and right parts are encoded using a TEX notation
 	RawSequent struct {
-		Left  string `json:"left"`
-		Right string `json:"right"`
+		Name          string `json:"name"`
+		Left          string `json:"left"`
+		Right         string `json:"right"`
+		Justification string `json:"just"`
 	}
 
 	// Prover object holding the prover state
