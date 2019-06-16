@@ -2,13 +2,22 @@
 <!-- <h2>Dimostratore</h2> -->
 <div>
   <h3>Formula</h3>
-  <input id="f1" type="text" value="" onblur="render('f1', 'f1render')"><div id="f1render" class="latex"></div>
+  <input id="f1" type="text" value="" onkeydown="render('f1', 'f1render')"><div id="f1render" class="latex"></div>
 </div>
 <button onclick="render('f1', 'f1render');prove()">Prove</button>
 <div>
   <h2>Solution</h2>
-  <ol id="solution">
-  </ol>
+  <ul style="list-style:none; padding:0;">
+    <li class="">
+      <div class="sequntsegment">Name</div>
+      <div class="sequntsegment">Left</div>
+      <div class="sequntdivider"></div>
+      <div class="sequntsegment">Right</div>
+      <div class="sequntsegment">Justification</div>
+    </li>
+  </ul>
+  <ul id="solution" style="list-style:none; padding:0;">
+  </ul>
 </div>
 <div>
   <h2>Symbols</h2>

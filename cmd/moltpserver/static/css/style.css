@@ -1,6 +1,6 @@
 .content {
   text-align: center;
-  width: 70%;
+  width: 80%;
   margin: auto;
 }
 
@@ -9,12 +9,12 @@
 }
 
 .sequntsegment {
-  width: 45%;
+  width: 23%;
   display: inline-block;
 }
 
 .sequntdivider {
-  width: 5%;
+  width: 2%;
   display: inline-block;
 }
 

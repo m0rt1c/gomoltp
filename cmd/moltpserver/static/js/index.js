@@ -40,12 +40,20 @@ function prove(){
             d2.classList.add("sequntdivider")
             d3 = document.createElement('div')
             d3.classList.add("sequntsegment")
+            d4 = document.createElement('div')
+            d4.classList.add("sequntsegment")
+            d5 = document.createElement('div')
+            d5.classList.add("sequntsegment")
+            li.appendChild(d5)
             li.appendChild(d1)
             li.appendChild(d2)
             li.appendChild(d3)
+            li.appendChild(d4)
+            d5.innerText = String(`${s["name"]}`)
             katex.render(String(`${s["left"]}`), d1);
             katex.render("\\leftarrow", d2);
             katex.render(String(`${s["right"]}`), d3);
+            d4.innerText = String(`${s["just"]}`)
             k++
             s = data[k]
           }
