@@ -1,12 +1,24 @@
 {{ define "content" }}
-<!-- <h2>Dimostratore</h2> -->
 <div>
   <h3>Formula</h3>
-  <input id="f1" type="text" value="" onkeydown="render('f1', 'f1render')"><div id="f1render" class="latex"></div>
+  <div style="width:100%">
+    <input id="f1" type="text" value="" onkeydown="render('f1', 'f1render')">
+    <button onclick="render('f1', 'f1render');prove()">Prove</button>
+  </div>
+  <h4><div id="f1render" class="latex"></div></h4>
 </div>
-<button onclick="render('f1', 'f1render');prove()">Prove</button>
 <div>
-  <h2>Solution</h2>
+  <h3>Relation</h3>
+  <div style="display:inline-flex">
+    <input type="checkbox" name="serial" value="1" checked>Serial<br>
+    <input type="checkbox" name="reflexive" value="0">Reflexive<br>
+    <input type="checkbox" name="symmetric" value="0">Symmetric<br>
+    <input type="checkbox" name="transitive" value="0">Transitive<br>
+    <input type="checkbox" name="euclidean" value="0">Euclidean<br>
+  </div>
+</div>
+<div>
+  <h3>Solution</h3>
   <ul style="list-style:none; padding:0;">
     <li class="">
       <div class="sequntsegment">Name</div>
@@ -20,7 +32,7 @@
   </ul>
 </div>
 <div>
-  <h2>Symbols</h2>
+  <h3>Symbols</h3>
   <div class="text2left">
     <ul>
       <li>Not: \lnot</li>
@@ -34,7 +46,7 @@
       <li>Diamond: \Diamond</li>
     </ul>
   </div>
-  <h2>Separators</h2>
+  <h3>Separators</h3>
   <div class="text2left">
     <ul>
       <li>(, ), [, ], {, }</li>
