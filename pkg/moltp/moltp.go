@@ -579,7 +579,8 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 func (p *Prover) Prove(rf *RawFormula) ([]*Sequent, error) {
 	p.initProver()
 	if p.Debug {
-		log.Printf("Input:\n\t%s\n", rf.Formula)
+		log.Println("Input:")
+		log.Printf("\t%s\n", rf.Formula)
 	}
 	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
 	if p.Debug {
