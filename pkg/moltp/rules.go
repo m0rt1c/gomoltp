@@ -226,7 +226,8 @@ func (r r7) applyRuleTo(s *Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		if f.Index.isGround() && len(t.GetAllFreeVars()) == 0 {
+
+		if f.Index.isGround() && len(t.GetAllFreeVars(nil)) == 0 {
 			ns := r.worldsKeeper.GetFreeIndividualConstant()
 			t.Index.Symbols = append([]*worldsymbol{ns}, f.Index.Symbols...)
 		} else {
@@ -290,23 +291,24 @@ func (r r9) applyRuleTo(s *Sequent) (*Sequent, error) {
 
 		g := &unification{Map: make(map[string]string)}
 		// TODO: Implement correct variable substitution
-		if t.Index.isGround() && len(t.GetAllFreeVars()) == 0 {
-			for _, v := range f.FreeVars {
+
+		m := make(map[string]bool)
+		for _, v := range f.Operands[:len(f.Operands)-1] {
+			m[v.Terminal] = true
+		}
+
+		if t.Index.isGround() && len(t.GetAllFreeVars(&m)) == 0 {
+			for _, v := range f.Vars {
 				g.Map[v] = (*r.worldsKeeper).GetFreeIndividualConstant().Value
 			}
 		} else {
-			for _, v := range f.FreeVars {
+			for _, v := range f.Vars {
 				g.Map[v] = (*r.worldsKeeper).GetSkolemFunctionOf(t).Value
 			}
 		}
 		t = g.applyUnification(t)
 
-		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
-		b := []*formula{}
-		for _, p := range s.Left[:l-1] {
-			b = append(b, p)
-		}
-		n.Left = append(b, t)
+		n.Right = append([]*formula{t}, s.Right[1:]...)
 
 		return n, nil
 	}
@@ -335,12 +337,7 @@ func (r r10) applyRuleTo(s *Sequent) (*Sequent, error) {
 
 		t = g.applyUnification(t)
 
-		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
-		b := []*formula{}
-		for _, p := range s.Left[:l-1] {
-			b = append(b, p)
-		}
-		n.Left = append(b, t)
+		n.Left = append(s.Left[:l-1], t)
 		n.Right = s.Right
 
 		return n, nil

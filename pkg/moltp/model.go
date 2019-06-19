@@ -2,7 +2,7 @@ package moltp
 
 import (
 	"fmt"
-	"strings"
+	"strconv"
 )
 
 type (
@@ -39,27 +39,22 @@ type (
 	}
 
 	token struct {
-		Value    string   // token symbol value
-		FreeVars []string // variable, used for functions and unviversal ops
-		IsTe     bool     // is terminal
-		IsIn     bool     // is an index for a terminal
-		IsLB     bool     // is left braket
-		IsRB     bool     // is right braket
-		IsOp     bool     // is operator
-		UnOp     bool     // is unary operator
-		BiOp     bool     // is binary oprator
-		MuOp     bool     // is miltiple arguments operator
-		IsCo     bool     // is comma for multiple args operators
-		Skip     int      // how many char was have to be skipped from input
+		Value string   // token symbol value
+		Vars  []string // variable, used for functions and unviversal ops
+		IsTe  bool     // is terminal
+		IsIn  bool     // is an index for a terminal
+		IsLB  bool     // is left braket
+		IsRB  bool     // is right braket
+		IsOp  bool     // is operator
+		UnOp  bool     // is unary operator
+		BiOp  bool     // is binary oprator
+		MuOp  bool     // is miltiple arguments operator
+		IsCo  bool     // is comma for multiple args operators
+		Skip  int      // how many char was have to be skipped from input
 	}
 
 	unification struct {
 		Map map[string]string
-	}
-
-	substitution struct {
-		Old *worldsymbol
-		New *worldsymbol
 	}
 
 	relation struct {
@@ -85,7 +80,7 @@ type (
 		Operands []*formula
 		Terminal string
 		Index    worldindex
-		FreeVars []string
+		Vars     []string
 	}
 )
 
@@ -101,9 +96,9 @@ func (f *formula) String() string {
 	switch len(f.Operands) {
 	case 0:
 		ter := f.Terminal
-		if len(f.FreeVars) > 0 {
+		if len(f.Vars) > 0 {
 			vars := ""
-			for _, v := range f.FreeVars {
+			for _, v := range f.Vars {
 				if vars == "" {
 					vars = v
 				} else {
@@ -173,20 +168,62 @@ func (i *worldindex) String() string {
 
 func (u *unification) String() string {
 	out := ""
-	if len(u.Map) > 0 {
-		for k, v := range u.Map {
-			out = fmt.Sprintf("%s/%s,", k, v)
+	for k, v := range u.Map {
+		if out == "" {
+			out = fmt.Sprintf("%s/%s", k, v)
+		} else {
+			out = fmt.Sprintf("%s,%s/%s", out, k, v)
 		}
 	}
-	return fmt.Sprintf("{%s}", strings.TrimSuffix(out, ","))
+	return fmt.Sprintf("{%s}", out)
+}
+
+func compose(m, n *unification) *unification {
+	if m == nil {
+		return n
+	}
+	if n == nil {
+		return m
+	}
+	for k, v := range m.Map {
+		n.Map[k] = v
+	}
+	return n
+}
+
+func unify(f, g *formula) *unification {
+	u := &unification{Map: make(map[string]string)}
+	l1 := len(f.Vars)
+	l2 := len(g.Vars)
+	if l1 < 1 || l2 < 1 {
+		return u
+	}
+	l := l1
+	if l2 < l1 {
+		l = l2
+	}
+	// TODO: change this
+	// In short we need to substite all non free variables usually not numbers
+	// with numbers
+	for i := 0; i < l; i++ {
+		a := f.Vars[i]
+		_, err1 := strconv.Atoi(a)
+		b := g.Vars[i]
+		_, err2 := strconv.Atoi(b)
+		if err1 == nil && err2 != nil {
+			u.Map[b] = a
+		}
+		if err1 != nil && err2 == nil {
+			u.Map[a] = b
+		}
+	}
+	return u
 }
 
 func (R *relation) munify(f, g *formula) *unification {
+	m := unify(f, g)
 	n := R.wunify(&f.Index, &g.Index)
-	if n != nil {
-		return n
-	}
-	return nil
+	return compose(m, n)
 }
 
 func (i *worldindex) parent(s *worldsymbol) *worldsymbol {
@@ -276,13 +313,12 @@ func (u *unification) applyUnification(f *formula) *formula {
 		if ok {
 			changes = true
 			t.Terminal = n
-		} else {
-			for i, v := range t.FreeVars {
-				n, ok := u.Map[v]
-				if ok {
-					changes = true
-					t.FreeVars[i] = n
-				}
+		}
+		for i, v := range t.Vars {
+			n, ok := u.Map[v]
+			if ok {
+				changes = true
+				t.Vars[i] = n
 			}
 		}
 	}
@@ -362,7 +398,7 @@ func (k *worldskeeper) GetSkolemFunctionOf(f *formula) *worldsymbol {
 			}
 		}
 	}
-	for _, s := range f.FreeVars {
+	for _, s := range f.Vars {
 		if vars == "" {
 			vars = s
 		} else {
@@ -391,10 +427,20 @@ func (k *worldskeeper) GetWorldVariable() *worldsymbol {
 }
 
 // GetAllFreeVars finds free vars in all the subformulas
-func (f *formula) GetAllFreeVars() []string {
+func (f *formula) GetAllFreeVars(nonFreeVars *map[string]bool) []string {
+	if nonFreeVars == nil {
+		f := make(map[string]bool)
+		nonFreeVars = &f
+	}
 	sub := []string{}
 	for _, o := range f.Operands {
-		sub = append(sub, o.GetAllFreeVars()...)
+		sub = append(sub, o.GetAllFreeVars(nonFreeVars)...)
 	}
-	return append(f.FreeVars, sub...)
+	for _, v := range sub {
+		_, ok := (*nonFreeVars)[v]
+		if !ok {
+			sub = append(sub, v)
+		}
+	}
+	return sub
 }
