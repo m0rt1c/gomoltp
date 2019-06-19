@@ -122,3 +122,29 @@ func TestProver3(t *testing.T) {
 
 	}
 }
+
+func TestProver5(t *testing.T) {
+	rf := &RawFormula{OID: 0, Formula: "\\Box (\\forall x p(x)) \\to (\\forall x \\Box p(x))"}
+	prover := Prover{Debug: false}
+	solution, err := prover.Prove(rf)
+	if err != nil {
+		t.Errorf("got error %s want nil", err)
+	} else {
+		out := []string{
+			"S1:  <- |( ( Box ( Forall ( x ) p(x) ) ) Implies ( Forall ( x ) ( Box p(x) ) ) )|_{0} []",
+			"S3: |( Box ( Forall ( x ) p(x) ) )|_{0} <-  [R4 S1]",
+			"S4: |p(v)|_{w:0} <-  [R8 S3]",
+			"S2:  <- |( Forall ( x ) ( Box p(x) ) )|_{0} [R3 S1]",
+			"S6:  <- |( Box p(1) )|_{0} [R9 S2]",
+			"S5: |p(v)|_{w:0} <-  [R10 S4]",
+			"S7:  <- |p(1)|_{2:0} [R7 S6]",
+			"S8:  <-  [R1 S5 S7 {w/2,v/1}]",
+		}
+		for i, o := range out {
+			s := fmt.Sprintf("%s", solution[i])
+			if o != s {
+				t.Errorf("got %s want %s", s, o)
+			}
+		}
+	}
+}
