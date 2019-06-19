@@ -286,6 +286,11 @@ func reduceFormulas(f *formula) *formula {
 		B := f.Operands[1]
 		g0 := &formula{Terminal: sNOT, Operands: []*formula{A}}
 		return &formula{Terminal: sIMPLY, Operands: []*formula{g0, B}}
+	case sEXISTS:
+		// \exists x p = \lnot \forall x \lnot p
+		g0 := &formula{Terminal: sNOT, Operands: []*formula{f.Operands[len(f.Operands)-1]}}
+		g1 := &formula{Terminal: sFORALL, Operands: append(f.Operands[:len(f.Operands)-1], g0)}
+		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
 	default:
 		return f
 	}
