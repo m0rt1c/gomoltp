@@ -177,6 +177,7 @@ func nextToken(s string) (*token, error) {
 		// TODO: supoort multi letters varaibles
 		if len(s) > 4 && s[1] == '(' {
 			skip := 2
+			vlist := []string{}
 			vars := ""
 			closed := false
 			for i := 2; i < len(s); i++ {
@@ -188,6 +189,7 @@ func nextToken(s string) (*token, error) {
 				if s[i] == ',' {
 					continue
 				}
+				vlist = append(vlist, fmt.Sprintf("%c", s[i]))
 				if vars == "" {
 					vars = fmt.Sprintf("%c", s[i])
 				} else {
@@ -198,7 +200,7 @@ func nextToken(s string) (*token, error) {
 				return nil, fmt.Errorf("Missing closing parenthesis for %s", s)
 			}
 			v := fmt.Sprintf("%c(%s)", s[0], vars)
-			return &token{IsTe: true, Value: v, Skip: skip}, nil
+			return &token{IsTe: true, Value: v, Skip: skip, FreeVars: vlist}, nil
 		}
 		return &token{IsTe: true, Value: fmt.Sprintf("%c", s[0]), Skip: 1}, nil
 	}
@@ -315,7 +317,7 @@ func reduceFormulas(f *formula) *formula {
 	case sEXISTS:
 		// \exists x p = \lnot \forall x \lnot p
 		g0 := &formula{Terminal: sNOT, Operands: []*formula{f.Operands[len(f.Operands)-1]}}
-		g1 := &formula{Terminal: sFORALL, Operands: append(f.Operands[:len(f.Operands)-1], g0)}
+		g1 := &formula{Terminal: sFORALL, Operands: append(f.Operands[:len(f.Operands)-1], g0), FreeVars: f.FreeVars}
 		return &formula{Terminal: sNOT, Operands: []*formula{g1}}
 	default:
 		return f
@@ -338,6 +340,7 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 				m := formulas[len(formulas)-1]
 				formulas = formulas[:len(formulas)-1]
 				f.Operands = append(f.Operands, formulas[len(formulas)-1])
+				f.FreeVars = append(f.FreeVars, formulas[len(formulas)-1].Terminal)
 				formulas = formulas[:len(formulas)-1]
 				// (2) this should find all the variables, mind that they are in the reversed order
 				for k := len(formulas) - 1; k >= 0; k-- {
@@ -346,11 +349,13 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 							return formulas[0], fmt.Errorf("missing argument for multi operator %s", t.Value)
 						}
 						f.Operands = append([]*formula{formulas[k-1]}, f.Operands...)
+						f.FreeVars = append(f.FreeVars, formulas[k-1].Terminal)
 					} else {
 						formulas = formulas[:k+1]
 						break
 					}
 				}
+
 				f.Operands = append(f.Operands, m)
 				formulas = append(formulas, f)
 			}
@@ -376,7 +381,7 @@ func genFormulasTree(tokens []*token) (*formula, error) {
 			}
 		}
 		if t.IsTe {
-			formulas = append(formulas, &formula{Terminal: t.Value})
+			formulas = append(formulas, &formula{Terminal: t.Value, FreeVars: t.FreeVars})
 		}
 		if t.IsIn {
 			if len(formulas) < 1 {
