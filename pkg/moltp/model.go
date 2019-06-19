@@ -54,7 +54,7 @@ type (
 	}
 
 	unification struct {
-		Map map[worldsymbol]worldsymbol
+		Map map[string]string
 	}
 
 	substitution struct {
@@ -100,10 +100,22 @@ func (s *Sequent) String() string {
 func (f *formula) String() string {
 	switch len(f.Operands) {
 	case 0:
-		if len(f.Index.Symbols) < 1 {
-			return fmt.Sprintf("%s", f.Terminal)
+		ter := f.Terminal
+		if len(f.FreeVars) > 0 {
+			vars := ""
+			for _, v := range f.FreeVars {
+				if vars == "" {
+					vars = v
+				} else {
+					vars = fmt.Sprintf("%s,%s", vars, v)
+				}
+			}
+			ter = fmt.Sprintf("%s(%s)", ter, vars)
 		}
-		return fmt.Sprintf("|%s|_{%s}", f.Terminal, &f.Index)
+		if len(f.Index.Symbols) < 1 {
+			return fmt.Sprintf("%s", ter)
+		}
+		return fmt.Sprintf("|%s|_{%s}", ter, &f.Index)
 	case 1:
 		if len(f.Index.Symbols) < 1 {
 			return fmt.Sprintf("( %s %s )", f.Terminal, f.Operands[0])
@@ -163,7 +175,7 @@ func (u *unification) String() string {
 	out := ""
 	if len(u.Map) > 0 {
 		for k, v := range u.Map {
-			out = fmt.Sprintf("%s/%s,", &k, &v)
+			out = fmt.Sprintf("%s/%s,", k, v)
 		}
 	}
 	return fmt.Sprintf("{%s}", strings.TrimSuffix(out, ","))
@@ -249,52 +261,69 @@ func (p *Prover) initProver() {
 }
 
 func (u *unification) applyUnification(f *formula) *formula {
-	newSymbols := []*worldsymbol{}
-	for _, s := range f.Index.Symbols {
-		newSymbols = append(newSymbols, &worldsymbol{Value: u.Map[*s].Value, Ground: u.Map[*s].Ground})
+	if f.Terminal == sFORALL {
+		f.Operands[len(f.Operands)-1] = u.applyUnification(f.Operands[len(f.Operands)-1])
+	} else {
+		for i, o := range f.Operands {
+			f.Operands[i] = u.applyUnification(o)
+		}
 	}
-	return f
+
+	t := copyTopFormulaLevel(f)
+	changes := false
+	if len(t.Operands) == 0 {
+		n, ok := u.Map[t.Terminal]
+		if ok {
+			changes = true
+			t.Terminal = n
+		} else {
+			for i, v := range t.FreeVars {
+				n, ok := u.Map[v]
+				if ok {
+					changes = true
+					t.FreeVars[i] = n
+				}
+			}
+		}
+	}
+	if !changes {
+		return f
+	}
+	return t
 }
 
 func (u *unification) applyUnifications(fs []*formula) []*formula {
-	for _, f := range fs {
-		u.applyUnification(f)
+	for i, f := range fs {
+		fs[i] = u.applyUnification(f)
 	}
 	return fs
 }
 
-func (s *substitution) compose(u *unification) *unification {
-	u.Map[*s.Old] = *s.New
-	return u
-}
-
 func (R *relation) findUnification(s0, s1 *worldsymbol) *unification {
-	u := &unification{Map: make(map[worldsymbol]worldsymbol)}
+	u := &unification{Map: make(map[string]string)}
+	u.Map[s0.Value] = s1.Value
 	return u
 }
 
 func (R *relation) wunify(i, j *worldindex) *unification {
 	if start(i).Value == "0" && start(j).Value == "0" {
 		if end(i).Ground && end(j).Ground && end(i).Value == end(j).Value {
-			return &unification{Map: make(map[worldsymbol]worldsymbol)}
+			return &unification{Map: make(map[string]string)}
 		}
 		if (end(i).Ground && !end(j).Ground || !end(i).Ground && end(j).Ground) && R.Serial {
-			o := R.findUnification(end(j), end(i))
+			o := R.findUnification(end(i), end(j))
 			if o != nil {
-				s := &substitution{Old: end(i), New: end(j)}
-				return s.compose(o)
+				return o
 			}
 		}
 		if !end(i).Ground && !end(j).Ground && R.Serial {
 			o := R.findUnification(end(j), end(i))
 			if o != nil {
-				s := &substitution{Old: end(i), New: end(j)}
-				return s.compose(o)
+				return o
 			}
 			o = R.findUnification(end(i), end(j))
 			if o != nil {
-				s := &substitution{Old: end(i), New: end(j)}
-				return s.compose(o)
+				return o
 			}
 		}
 	}
@@ -325,7 +354,7 @@ func (k *worldskeeper) GetSkolemFunctionOf(f *formula) *worldsymbol {
 	// TODO: Implement corret world index value
 	vars := ""
 	for _, s := range f.Index.Symbols {
-		if s.Ground {
+		if !s.Ground {
 			if vars == "" {
 				vars = s.Value
 			} else {
@@ -359,4 +388,13 @@ func (k *worldskeeper) GetWorldVariable() *worldsymbol {
 		k.nextVar = k.nextVar + "'"
 	}
 	return &worldsymbol{Value: old, Ground: false}
+}
+
+// GetAllFreeVars finds free vars in all the subformulas
+func (f *formula) GetAllFreeVars() []string {
+	sub := []string{}
+	for _, o := range f.Operands {
+		sub = append(sub, o.GetAllFreeVars()...)
+	}
+	return append(f.FreeVars, sub...)
 }

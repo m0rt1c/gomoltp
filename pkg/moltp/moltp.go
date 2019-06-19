@@ -28,10 +28,10 @@ var (
 func copyTopFormulaLevel(src *formula) *formula {
 	dst := &formula{}
 
-	dst.Operands = src.Operands
+	dst.Operands = append([]*formula{}, src.Operands...)
 	dst.Terminal = src.Terminal
 	dst.Index = src.Index
-	dst.FreeVars = src.FreeVars
+	dst.FreeVars = append([]string{}, src.FreeVars...)
 
 	return dst
 }
@@ -201,7 +201,7 @@ func nextToken(s string) (*token, error) {
 			if !closed {
 				return nil, fmt.Errorf("Missing closing parenthesis for %s", s)
 			}
-			v := fmt.Sprintf("%c(%s)", s[0], vars)
+			v := fmt.Sprintf("%c", s[0])
 			return &token{IsTe: true, Value: v, Skip: skip, FreeVars: vlist}, nil
 		}
 		return &token{IsTe: true, Value: fmt.Sprintf("%c", s[0]), Skip: 1}, nil
