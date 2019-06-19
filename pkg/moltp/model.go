@@ -67,7 +67,6 @@ type (
 
 	worldsymbol struct {
 		Value  string
-		Index  int
 		Ground bool
 	}
 
@@ -76,8 +75,9 @@ type (
 	}
 
 	worldskeeper struct {
-		NextConst int
-		NextVar   string
+		nextConst    int
+		nextVar      string
+		nextFunction string
 	}
 
 	formula struct {
@@ -139,10 +139,7 @@ func (f *formula) String() string {
 }
 
 func (s *worldsymbol) String() string {
-	if s.Ground {
-		return s.Value
-	}
-	return fmt.Sprintf("%s%d", s.Value, s.Index)
+	return s.Value
 }
 
 func (i *worldindex) String() string {
@@ -223,11 +220,13 @@ func start(i *worldindex) *worldsymbol {
 	return i.Symbols[l-1]
 }
 
-func (p *Prover) initRules() {
+func (p *Prover) initProver() {
 	if p.R == nil {
 		p.R = &relation{Serial: true}
 	}
-	p.worldsKeeper = &worldskeeper{NextVar: "W", NextConst: 0}
+	if p.worldsKeeper == nil {
+		p.worldsKeeper = &worldskeeper{nextVar: "w", nextConst: 0, nextFunction: "f"}
+	}
 	if len(p.Rules) == 0 {
 		// TODO make this look better
 		p.Rules = []inferenceRule{
@@ -250,7 +249,7 @@ func (p *Prover) initRules() {
 func (u *unification) applyUnification(f *formula) *formula {
 	newSymbols := []*worldsymbol{}
 	for _, s := range f.Index.Symbols {
-		newSymbols = append(newSymbols, &worldsymbol{Value: u.Map[*s].Value, Index: u.Map[*s].Index, Ground: u.Map[*s].Ground})
+		newSymbols = append(newSymbols, &worldsymbol{Value: u.Map[*s].Value, Ground: u.Map[*s].Ground})
 	}
 	return f
 }
@@ -300,13 +299,45 @@ func (R *relation) wunify(i, j *worldindex) *unification {
 	return nil
 }
 
-func (k *worldskeeper) updateNextVariable() {
-	switch k.NextVar {
-	case "W":
-		k.NextVar = "V"
-	case "V":
-		k.NextVar = "T"
+func (k *worldskeeper) GetFreeIndividualConstant() *worldsymbol {
+	old := fmt.Sprintf("%d", k.nextConst)
+	k.nextConst = k.nextConst + 1
+	return &worldsymbol{Value: old, Ground: true}
+}
+
+func (k *worldskeeper) GetSkolemFunctionOf(*formula) *worldsymbol {
+	old := k.nextFunction
+	switch k.nextFunction[0] {
+	case 'f':
+		k.nextFunction = "g"
+	case 'g':
+		k.nextFunction = "h"
+	case 'h':
+		k.nextFunction = "f'"
 	default:
-		k.NextVar = fmt.Sprintf("%s'", k.NextVar)
+		k.nextFunction = fmt.Sprintf("%s'", k.nextFunction)
 	}
+	for i := 0; i < len(old)-1; i++ {
+		k.nextFunction = k.nextFunction + "'"
+	}
+	// TODO: Implement corret world index value
+	return &worldsymbol{Value: fmt.Sprintf("%s()", old), Ground: true}
+}
+
+func (k *worldskeeper) GetWorldVariable() *worldsymbol {
+	old := k.nextVar
+	switch k.nextVar[0] {
+	case 'w':
+		k.nextVar = "v"
+	case 'v':
+		k.nextVar = "u"
+	case 'u':
+		k.nextVar = "w'"
+	default:
+		k.nextVar = fmt.Sprintf("%s'", k.nextVar)
+	}
+	for i := 0; i < len(old)-1; i++ {
+		k.nextVar = k.nextVar + "'"
+	}
+	return &worldsymbol{Value: old, Ground: false}
 }

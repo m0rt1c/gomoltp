@@ -381,8 +381,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 	unreduced := []*Sequent{}
 	reduced := []*Sequent{}
 
-	f.Index = worldindex{[]*worldsymbol{&worldsymbol{Ground: true, Value: "0"}}}
-	p.worldsKeeper.NextConst = p.worldsKeeper.NextConst + 1
+	f.Index = worldindex{[]*worldsymbol{p.worldsKeeper.GetFreeIndividualConstant()}}
 
 	unreduced = append(unreduced, &Sequent{Right: []*formula{f}, Name: "S1"})
 
@@ -541,7 +540,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 // Prove givent a set of formulas it output a solution, if debugOn is true debugging messages will be printed
 func (p *Prover) Prove(rf *RawFormula) ([]*Sequent, error) {
-	p.initRules()
+	p.initProver()
 	if p.Debug {
 		fmt.Printf("Input:\n\t%s\n", rf.Formula)
 	}
