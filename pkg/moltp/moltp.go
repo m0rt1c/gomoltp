@@ -31,6 +31,7 @@ func copyTopFormulaLevel(src *formula) *formula {
 	dst.Operands = src.Operands
 	dst.Terminal = src.Terminal
 	dst.Index = src.Index
+	dst.FreeVars = src.FreeVars
 
 	return dst
 }
