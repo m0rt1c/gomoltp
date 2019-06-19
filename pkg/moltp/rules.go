@@ -83,7 +83,10 @@ func (r r1) applyRuleTo(sequents *[]*Sequent) ([]*Sequent, error) {
 						t2 = g.applyUnifications(s2.Right[1:])
 						n.Right = append(t1, t2...)
 
-						n.Justification = []string{r.Name, s1.Name, s2.Name, fmt.Sprintf("%s", g)}
+						n.Justification = []string{r.Name, s1.Name, s2.Name}
+						if len(g.Map) > 0 {
+							n.Justification = append(n.Justification, fmt.Sprintf("%s", g))
+						}
 
 						return []*Sequent{s1, s2, n}, nil
 					}

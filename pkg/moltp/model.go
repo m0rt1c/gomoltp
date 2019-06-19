@@ -337,6 +337,11 @@ func (u *unification) applyUnifications(fs []*formula) []*formula {
 
 func (R *relation) findUnification(s0, s1 *worldsymbol) *unification {
 	u := &unification{Map: make(map[string]string)}
+	// TODO: we need to change this
+	_, err := strconv.Atoi(s1.Value)
+	if err != nil {
+		return u
+	}
 	u.Map[s0.Value] = s1.Value
 	return u
 }
