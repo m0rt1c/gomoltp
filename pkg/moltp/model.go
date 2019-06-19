@@ -39,17 +39,18 @@ type (
 	}
 
 	token struct {
-		Value string // token symbol value
-		IsTe  bool   // is terminal
-		IsIn  bool   // is an index for a terminal
-		IsLB  bool   // is left braket
-		IsRB  bool   // is right braket
-		IsOp  bool   // is operator
-		UnOp  bool   // is unary operator
-		BiOp  bool   // is binary oprator
-		MuOp  bool   // is miltiple arguments operator
-		IsCo  bool   // is comma for multiple args operators
-		Skip  int    // how many char was have to be skipped from input
+		Value string   // token symbol value
+		FreeVars  []string // variable, used for functions and unviversal ops
+		IsTe  bool     // is terminal
+		IsIn  bool     // is an index for a terminal
+		IsLB  bool     // is left braket
+		IsRB  bool     // is right braket
+		IsOp  bool     // is operator
+		UnOp  bool     // is unary operator
+		BiOp  bool     // is binary oprator
+		MuOp  bool     // is miltiple arguments operator
+		IsCo  bool     // is comma for multiple args operators
+		Skip  int      // how many char was have to be skipped from input
 	}
 
 	unification struct {
@@ -84,6 +85,7 @@ type (
 		Operands []*formula
 		Terminal string
 		Index    worldindex
+		FreeVars []string
 	}
 )
 
