@@ -226,7 +226,7 @@ func (r r7) applyRuleTo(s *Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
-		if f.Index.isGround() {
+		if f.Index.isGround() && len(f.FreeVars) == 0 {
 			ns := r.worldsKeeper.GetFreeIndividualConstant()
 			t.Index.Symbols = append([]*worldsymbol{ns}, f.Index.Symbols...)
 		} else {
