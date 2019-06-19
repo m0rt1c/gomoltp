@@ -2,6 +2,7 @@ package moltp
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 )
@@ -423,27 +424,27 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 	for len(unreduced) > 0 {
 		if p.Debug {
-			fmt.Println("******************************")
-			fmt.Println("**** Applying rules loop *****")
-			fmt.Println("******************************")
-			fmt.Println("Unreduced:")
+			log.Println("******************************")
+			log.Println("**** Applying rules loop *****")
+			log.Println("******************************")
+			log.Println("Unreduced:")
 			for _, u := range unreduced {
-				fmt.Printf("\t%s\n", u)
+				log.Printf("\t%s\n", u)
 			}
 			if len(solution) < 1 {
-				fmt.Println("Solution is empty")
+				log.Println("Solution is empty")
 			} else {
-				fmt.Println("Partial Solution:")
+				log.Println("Partial Solution:")
 				for _, s := range solution {
-					fmt.Printf("\t%s\n", s)
+					log.Printf("\t%s\n", s)
 				}
 			}
 			if len(reduced) < 1 {
-				fmt.Println("Reduced list is empty")
+				log.Println("Reduced list is empty")
 			} else {
-				fmt.Println("Reduced:")
+				log.Println("Reduced:")
 				for _, s := range reduced {
-					fmt.Printf("\t%s\n", s)
+					log.Printf("\t%s\n", s)
 				}
 			}
 		}
@@ -460,7 +461,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 			}
 			if s != nil {
 				if p.Debug {
-					fmt.Printf("Rule %s was applied on %s\n", rule.getName(), last)
+					log.Printf("Rule %s was applied on %s\n", rule.getName(), last)
 				}
 				pushLastInSolution = true
 				// The rule was applied successfully
@@ -475,7 +476,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 				}
 				new = append(new, s)
 				if p.Debug {
-					fmt.Printf("New sequent is %s\n", s)
+					log.Printf("New sequent is %s\n", s)
 				}
 			}
 			// else the rule was not appliable
@@ -493,27 +494,27 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 	}
 
 	if p.Debug {
-		fmt.Println("******************************")
-		fmt.Println("***** Unreduced are over *****")
-		fmt.Println("******************************")
-		fmt.Println("Unreduced:")
+		log.Println("******************************")
+		log.Println("***** Unreduced are over *****")
+		log.Println("******************************")
+		log.Println("Unreduced:")
 		for _, u := range unreduced {
-			fmt.Printf("\t%s\n", u)
+			log.Printf("\t%s\n", u)
 		}
 		if len(solution) < 1 {
-			fmt.Println("Solution is empty")
+			log.Println("Solution is empty")
 		} else {
-			fmt.Println("Partial Solution:")
+			log.Println("Partial Solution:")
 			for _, s := range solution {
-				fmt.Printf("\t%s\n", s)
+				log.Printf("\t%s\n", s)
 			}
 		}
 		if len(reduced) < 1 {
-			fmt.Println("Reduced list is empty")
+			log.Println("Reduced list is empty")
 		} else {
-			fmt.Println("Reduced:")
+			log.Println("Reduced:")
 			for _, s := range reduced {
-				fmt.Printf("\t%s\n", s)
+				log.Printf("\t%s\n", s)
 			}
 		}
 	}
@@ -526,7 +527,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 		}
 		if len(res) > 0 {
 			if p.Debug {
-				fmt.Printf("Rule %s was applied on %s\n", rule.getName(), reduced)
+				log.Printf("Rule %s was applied on %s\n", rule.getName(), reduced)
 			}
 			s := res[2]
 			// The rule was applied successfully
@@ -534,7 +535,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 			s.Name = fmt.Sprintf("S%d", i)
 
 			if p.Debug {
-				fmt.Printf("New sequent is %s\n", s)
+				log.Printf("New sequent is %s\n", s)
 			}
 
 			if len(s.Left) == 0 && len(s.Right) == 0 {
@@ -546,27 +547,27 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 	}
 
 	if p.Debug {
-		fmt.Println("******************************")
-		fmt.Println("******* R1 was applied *******")
-		fmt.Println("******************************")
-		fmt.Println("Unreduced:")
+		log.Println("******************************")
+		log.Println("******* R1 was applied *******")
+		log.Println("******************************")
+		log.Println("Unreduced:")
 		for _, u := range unreduced {
-			fmt.Printf("\t%s\n", u)
+			log.Printf("\t%s\n", u)
 		}
 		if len(solution) < 1 {
-			fmt.Println("Solution is empty")
+			log.Println("Solution is empty")
 		} else {
-			fmt.Println("Partial Solution:")
+			log.Println("Partial Solution:")
 			for _, s := range solution {
-				fmt.Printf("\t%s\n", s)
+				log.Printf("\t%s\n", s)
 			}
 		}
 		if len(reduced) < 1 {
-			fmt.Println("Reduced list is empty")
+			log.Println("Reduced list is empty")
 		} else {
-			fmt.Println("Reduced:")
+			log.Println("Reduced:")
 			for _, s := range reduced {
-				fmt.Printf("\t%s\n", s)
+				log.Printf("\t%s\n", s)
 			}
 		}
 	}
@@ -578,13 +579,18 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 func (p *Prover) Prove(rf *RawFormula) ([]*Sequent, error) {
 	p.initProver()
 	if p.Debug {
-		fmt.Printf("Input:\n\t%s\n", rf.Formula)
+		log.Printf("Input:\n\t%s\n", rf.Formula)
 	}
 	tokens, err := tokenize(strings.Replace(rf.Formula, " ", "", -1), 0x00)
 	if p.Debug {
-		fmt.Println("Tokens:")
+		log.Println("Tokens:")
 		for i := len(tokens) - 1; i >= 0; i-- {
-			fmt.Printf("\t%d: %s\n", len(tokens)-i, tokens[i].Value)
+			t := tokens[i]
+			if len(t.FreeVars) == 0 {
+				log.Printf("\t%d: %s\n", len(tokens)-i, t.Value)
+			} else {
+				log.Printf("\t%d: %s FreeVars: %s\n", len(tokens)-i, t.Value, t.FreeVars)
+			}
 		}
 	}
 	if err != nil {
@@ -592,17 +598,17 @@ func (p *Prover) Prove(rf *RawFormula) ([]*Sequent, error) {
 	}
 	top, err := genFormulasTree(tokens)
 	if p.Debug {
-		fmt.Println("Formula:")
-		fmt.Printf("\t%s\n", top)
+		log.Println("Formula:")
+		log.Printf("\t%s\n", top)
 	}
 	if err != nil {
 		return nil, err
 	}
 	s, err := p.proveFormula(top)
 	if p.Debug {
-		fmt.Println("Sequents:")
+		log.Println("Sequents:")
 		for _, Sequent := range s {
-			fmt.Printf("\t%s\n", Sequent)
+			log.Printf("\t%s\n", Sequent)
 		}
 	}
 	if err != nil {
