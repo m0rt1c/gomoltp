@@ -333,6 +333,13 @@ func (k *worldskeeper) GetSkolemFunctionOf(f *formula) *worldsymbol {
 			}
 		}
 	}
+	for _, s := range f.FreeVars {
+		if vars == "" {
+			vars = s
+		} else {
+			vars = fmt.Sprintf("%s,%s", vars, s)
+		}
+	}
 	return &worldsymbol{Value: fmt.Sprintf("%s(%s)", old, vars), Ground: true}
 }
 
