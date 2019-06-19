@@ -47,9 +47,9 @@ func TestProver1(t *testing.T) {
 			"S3: |( Box a )|_{0} <-  [R4 S1]",
 			"S2:  <- |( Box ( Box a ) )|_{0} [R3 S1]",
 			"S5:  <- |( Box a )|_{1:0} [R7 S2]",
-			"S4: |a|_{W0:0} <-  [R8 S3]",
+			"S4: |a|_{w:0} <-  [R8 S3]",
 			"S6:  <- |a|_{2:1:0} [R7 S5]",
-			"S7:  <-  [R1 S4 S6 {W0/2}]",
+			"S7:  <-  [R1 S4 S6 {w/2}]",
 		}
 		for i, o := range out {
 			s := fmt.Sprintf("%s", solution[i])
@@ -71,16 +71,16 @@ func TestProver2(t *testing.T) {
 		out := []string{
 			"S1:  <- |( ( Box ( Box a ) ) Implies ( Not ( Box ( Not ( Not ( Box ( Not a ) ) ) ) ) ) )|_{0} []",
 			"S3: |( Box ( Box a ) )|_{0} <-  [R4 S1]",
-			"S4: |( Box a )|_{W0:0} <-  [R8 S3]",
+			"S4: |( Box a )|_{w:0} <-  [R8 S3]",
 			"S2:  <- |( Not ( Box ( Not ( Not ( Box ( Not a ) ) ) ) ) )|_{0} [R3 S1]",
 			"S6: |( Box ( Not ( Not ( Box ( Not a ) ) ) ) )|_{0} <-  [R6 S2]",
-			"S7: |( Box ( Not a ) )|_{V0:0} <-  [R8 S6]",
-			"S8:  <- |( Not ( Box ( Not a ) ) )|_{V0:0} [R5 S7]",
-			"S9: |( Box ( Not a ) )|_{V0:0} <-  [R6 S8]",
-			"S10: |( Not a )|_{V1:V0:0} <-  [R8 S9]",
-			"S5: |a|_{W1:W0:0} <-  [R8 S4]",
-			"S11:  <- |a|_{V1:V0:0} [R5 S10]",
-			"S12:  <-  [R1 S5 S11 {W1/V1}]",
+			"S7: |( Box ( Not a ) )|_{u:0} <-  [R8 S6]",
+			"S8:  <- |( Not ( Box ( Not a ) ) )|_{u:0} [R5 S7]",
+			"S9: |( Box ( Not a ) )|_{u:0} <-  [R6 S8]",
+			"S10: |( Not a )|_{w':u:0} <-  [R8 S9]",
+			"S5: |a|_{v:w:0} <-  [R8 S4]",
+			"S11:  <- |a|_{w':u:0} [R5 S10]",
+			"S12:  <-  [R1 S5 S11]",
 		}
 		for i, o := range out {
 			s := fmt.Sprintf("%s", solution[i])
@@ -108,10 +108,10 @@ func TestProver3(t *testing.T) {
 			"S2:  <- |( Box ( Not ( Box ( Not a ) ) ) )|_{0} [R3 S1]",
 			"S8:  <- |( Not ( Box ( Not a ) ) )|_{2:0} [R7 S2]",
 			"S9: |( Box ( Not a ) )|_{2:0} <-  [R6 S8]",
-			"S10: |( Not a )|_{V0:2:0} <-  [R8 S9]",
-			"S7: |a|_{W0:1:0} <-  [R8 S6]",
-			"S11:  <- |a|_{V0:2:0} [R5 S10]",
-			"S12:  <-  [R1 S7 S11 {W0/V0}]",
+			"S10: |( Not a )|_{v:2:0} <-  [R8 S9]",
+			"S7: |a|_{w:1:0} <-  [R8 S6]",
+			"S11:  <- |a|_{v:2:0} [R5 S10]",
+			"S12:  <-  [R1 S7 S11]",
 		}
 		for i, o := range out {
 			s := fmt.Sprintf("%s", solution[i])
