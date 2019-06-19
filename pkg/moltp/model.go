@@ -305,7 +305,7 @@ func (k *worldskeeper) GetFreeIndividualConstant() *worldsymbol {
 	return &worldsymbol{Value: old, Ground: true}
 }
 
-func (k *worldskeeper) GetSkolemFunctionOf(*formula) *worldsymbol {
+func (k *worldskeeper) GetSkolemFunctionOf(f *formula) *worldsymbol {
 	old := k.nextFunction
 	switch k.nextFunction[0] {
 	case 'f':
@@ -321,7 +321,17 @@ func (k *worldskeeper) GetSkolemFunctionOf(*formula) *worldsymbol {
 		k.nextFunction = k.nextFunction + "'"
 	}
 	// TODO: Implement corret world index value
-	return &worldsymbol{Value: fmt.Sprintf("%s()", old), Ground: true}
+	vars := ""
+	for _, s := range f.Index.Symbols {
+		if s.Ground {
+			if vars == "" {
+				vars = s.Value
+			} else {
+				vars = fmt.Sprintf("%s,%s", vars, s.Value)
+			}
+		}
+	}
+	return &worldsymbol{Value: fmt.Sprintf("%s(%s)", old, vars), Ground: true}
 }
 
 func (k *worldskeeper) GetWorldVariable() *worldsymbol {
