@@ -2,6 +2,7 @@ package moltp
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 )
 
@@ -168,7 +169,17 @@ func (i *worldindex) String() string {
 
 func (u *unification) String() string {
 	out := ""
-	for k, v := range u.Map {
+
+	// Sorting keys to print always in the same order
+	// Otherwuse ome tests fails randomly
+	keys := []string{}
+	for k := range u.Map {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		v := u.Map[k]
 		if out == "" {
 			out = fmt.Sprintf("%s/%s", k, v)
 		} else {
