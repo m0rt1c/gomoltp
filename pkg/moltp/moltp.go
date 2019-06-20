@@ -553,7 +553,7 @@ func (p *Prover) proveFormula(f *formula) ([]*Sequent, error) {
 
 	if p.Debug {
 		log.Println("******************************")
-		log.Println("******* R1 was applied *******")
+		log.Printf("******* %s was applied *******\n", p.ResolutionRule.getName())
 		log.Println("******************************")
 		log.Println("Unreduced:")
 		for _, u := range unreduced {
