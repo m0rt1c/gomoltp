@@ -2,6 +2,8 @@ package moltp
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"strings"
 	"testing"
 )
@@ -37,7 +39,10 @@ func TestReduceANDFormula(t *testing.T) {
 
 func TestProver1(t *testing.T) {
 	rf := &RawFormula{OID: 0, Formula: "\\Box a \\to \\Box \\Box a"}
-	prover := Prover{Debug: false}
+	// logging to temp file so that we cannot see it
+	w, _ := os.Open("/tmp/test.log")
+	log.SetOutput(w)
+	prover := Prover{Debug: true}
 	solution, err := prover.Prove(rf)
 	if err != nil {
 		t.Errorf("got error %s want nil", err)
