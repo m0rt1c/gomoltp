@@ -138,7 +138,7 @@ func TestProver5(t *testing.T) {
 			"S6:  <- |( Box p(1) )|_{0} [R9 S2]",
 			"S5: |p(v)|_{w:0} <-  [R10 S4]",
 			"S7:  <- |p(1)|_{2:0} [R7 S6]",
-			"S8:  <-  [R1 S5 S7 {w/2,v/1}]",
+			"S8:  <-  [R1 S5 S7 {v/1,w/2}]",
 		}
 		for i, o := range out {
 			s := fmt.Sprintf("%s", solution[i])
