@@ -112,7 +112,8 @@ func (r r2) applyRuleTo(s *Sequent) (*Sequent, error) {
 
 		t := copyTopFormulaLevel(f.Operands[1])
 		t.Index = f.Index
-		n.Left = append(s.Left[:l-1], t)
+		n.Left = append([]*formula{}, s.Left[:l-1]...)
+		n.Left = append(n.Left, t)
 
 		t = copyTopFormulaLevel(f.Operands[0])
 		t.Index = f.Index
@@ -263,11 +264,8 @@ func (r r8) applyRuleTo(s *Sequent) (*Sequent, error) {
 		t.Index.Symbols = append([]*worldsymbol{ns}, f.Index.Symbols...)
 
 		// n.Left = append(s.Left[:l-1], t) TODO: WTF!!!!
-		b := []*formula{}
-		for _, p := range s.Left[:l-1] {
-			b = append(b, p)
-		}
-		n.Left = append(b, t)
+		n.Left = append([]*formula{}, s.Left[:l-1]...)
+		n.Left = append(n.Left, t)
 		n.Right = s.Right
 
 		return n, nil
@@ -340,7 +338,9 @@ func (r r10) applyRuleTo(s *Sequent) (*Sequent, error) {
 
 		t = g.applyUnification(t)
 
-		n.Left = append(s.Left[:l-1], t)
+		// TODO: n.Left = append(n.Left[:l-1], t) this has side effects on s
+		n.Left = append([]*formula{}, s.Left[:l-1]...)
+		n.Left = append(n.Left, t)
 		n.Right = s.Right
 
 		return n, nil
