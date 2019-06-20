@@ -37,6 +37,40 @@ func TestReduceANDFormula(t *testing.T) {
 	}
 }
 
+func TestEncodeSequentSlice(t *testing.T) {
+	A := &formula{Terminal: "A"}
+	B := &formula{Terminal: "B"}
+
+	g0 := &formula{Terminal: sFORALL, Operands: []*formula{&formula{Terminal: "x"}, &formula{Terminal: "f", Vars: []string{"x"}}}}
+	g1 := &formula{Terminal: sIMPLY, Operands: []*formula{A, g0}}
+	g2 := &formula{Terminal: sNOT, Operands: []*formula{g1}}
+
+	g3 := &formula{Terminal: sNOT, Operands: []*formula{B}}
+	g4 := &formula{Terminal: sIMPLY, Operands: []*formula{A, g3}}
+	g5 := &formula{Terminal: sBOX, Operands: []*formula{g4}}
+
+	s := &Sequent{}
+	s.Name = "S1"
+	s.Justification = []string{"R11", "S0"}
+	s.Left = []*formula{g2}
+	s.Right = []*formula{g5}
+
+	encoded, err := EncodeSequentSlice([]*Sequent{s})
+	if err != nil {
+		t.Errorf("got error %s want nil", err)
+	} else {
+		out := []string{
+			"{S1 ( \\lnot ( A \\to ( \\forall ( x ) f(x) ) ) ) ( \\Box ( A \\to ( \\lnot B ) ) ) R11, S0}",
+		}
+		for i, o := range out {
+			s := fmt.Sprintf("%s", (*encoded)[i])
+			if o != s {
+				t.Errorf("got %s want %s", s, o)
+			}
+		}
+	}
+}
+
 func TestProver1(t *testing.T) {
 	rf := &RawFormula{OID: 0, Formula: "\\Box a \\to \\Box \\Box a"}
 	// logging to temp file so that we cannot see it
