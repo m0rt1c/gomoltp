@@ -133,7 +133,7 @@ func TestProver5(t *testing.T) {
 		out := []string{
 			"S1:  <- |( ( Box ( Forall ( x ) p(x) ) ) Implies ( Forall ( x ) ( Box p(x) ) ) )|_{0} []",
 			"S3: |( Box ( Forall ( x ) p(x) ) )|_{0} <-  [R4 S1]",
-			"S4: |p(v)|_{w:0} <-  [R8 S3]",
+			"S4: |( Forall ( x ) p(x) )|_{w:0} <-  [R8 S3]",
 			"S2:  <- |( Forall ( x ) ( Box p(x) ) )|_{0} [R3 S1]",
 			"S6:  <- |( Box p(1) )|_{0} [R9 S2]",
 			"S5: |p(v)|_{w:0} <-  [R10 S4]",
