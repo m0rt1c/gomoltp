@@ -230,6 +230,7 @@ func (r r7) applyRuleTo(s *Sequent) (*Sequent, error) {
 		n := &Sequent{}
 
 		t := copyTopFormulaLevel(f.Operands[0])
+		t.Index = f.Index
 
 		if f.Index.isGround() && len(t.GetAllFreeVars(nil)) == 0 {
 			ns := r.worldsKeeper.GetFreeIndividualConstant()
