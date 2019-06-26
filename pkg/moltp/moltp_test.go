@@ -150,7 +150,7 @@ func TestProver3(t *testing.T) {
 			"S10: |( Not a )|_{v:2:0} <-  [R8 S9]",
 			"S7: |a|_{w:1:0} <-  [R8 S6]",
 			"S11:  <- |a|_{v:2:0} [R5 S10]",
-			"S12:  <-  [R1 S7 S11]",
+			"S12:  <-  [R1 S7 S11 {v/2,w/2}]",
 		}
 		for i, o := range out {
 			s := fmt.Sprintf("%s", solution[i])
