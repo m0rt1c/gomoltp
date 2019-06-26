@@ -241,7 +241,7 @@ func (i *worldindex) parent(s *worldsymbol) *worldsymbol {
 	for k, p := range i.Symbols {
 		if p == s {
 			if k < len(i.Symbols)+1 {
-				return i.Symbols[len(i.Symbols)+1]
+				return i.Symbols[k+1]
 			}
 			return nil
 		}
@@ -350,10 +350,15 @@ func (R *relation) findUnification(s0, s1 *worldsymbol) *unification {
 	u := &unification{Map: make(map[string]string)}
 	// TODO: we need to change this
 	_, err := strconv.Atoi(s1.Value)
-	if err != nil {
+	if err == nil {
+		u.Map[s0.Value] = s1.Value
 		return u
 	}
-	u.Map[s0.Value] = s1.Value
+	_, err = strconv.Atoi(s0.Value)
+	if err != nil {
+		return nil
+	}
+	u.Map[s1.Value] = s0.Value
 	return u
 }
 
@@ -369,13 +374,21 @@ func (R *relation) wunify(i, j *worldindex) *unification {
 			}
 		}
 		if !end(i).Ground && !end(j).Ground && R.Serial {
-			o := R.findUnification(end(j), end(i))
-			if o != nil {
-				return o
+			o1 := R.findUnification(j.parent(end(j)), end(i))
+			m := &worldsymbol{}
+			m.Value = i.parent(end(i)).Value
+			if o1 != nil {
+				m.Value = o1.Map[end(i).Value]
 			}
-			o = R.findUnification(end(i), end(j))
-			if o != nil {
-				return o
+			o2 := R.findUnification(m, end(j))
+			if o1 != nil && o2 != nil {
+				return compose(o1, o2)
+			}
+			if o1 != nil {
+				return o1
+			}
+			if o2 != nil {
+				return o2
 			}
 		}
 	}
