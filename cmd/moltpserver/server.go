@@ -31,12 +31,14 @@ var (
 	staticFolder    string
 	templatesFolder string
 	debugOn         bool
+	port            int
 )
 
 func init() {
 	flag.StringVar(&staticFolder, "static", "/var/www/html/static", "Path to folder holding static files.")
 	flag.StringVar(&templatesFolder, "templates", "/var/www/html/templates", "Path to folder holding html pages templates files.")
-	flag.BoolVar(&debugOn, "v", false, "Swith for log printing")
+	flag.BoolVar(&debugOn, "v", false, "Swith for log printing.")
+	flag.IntVar(&port, "port", 4000, "Http server port.")
 }
 
 func fixFolderPath(p string) string {
@@ -148,5 +150,5 @@ func main() {
 	http.HandleFunc("/prover", proofHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticFolder))))
 
-	log.Fatal(http.ListenAndServe("127.0.0.1:4000", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("127.0.0.1:%d", port), nil))
 }
