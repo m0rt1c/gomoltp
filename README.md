@@ -1,7 +1,7 @@
 # modal-logic-theorem-prover
 
 ### Authors
-Andrea Jegehr
+Andrea Jegher
 
 ### References
 * Based on the book by P. Jackson, “Logic-based  knowledge  representation,” MIT Press, 1985
